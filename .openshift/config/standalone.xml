@@ -113,6 +113,11 @@
             <logger category="jacorb.config">
                 <level name="ERROR"/>
             </logger>
+            
+            <logger category="kh.callsign.spotcollector.mdb">
+                <level name="INFO"/>
+            </logger>
+            
             <root-logger>
                 <level name="INFO"/>
                 <handlers>
@@ -445,6 +450,10 @@
                     </jms-queue>
                     <jms-queue name="DLQ">
                         <entry name="java:/jms/queue/DLQ"/>
+                    </jms-queue>
+                    <jms-queue name="spotQueue">
+                        <entry name="jms/queue/spot"/>
+                        <entry name="java:jboss/exported/jms/queue/spot"/>
                     </jms-queue>
                 </jms-destinations>
             </hornetq-server>
