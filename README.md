@@ -1,3 +1,8 @@
-The OpenShift `jbossas` cartridge documentation can be found at:
+Callsignviz
+===========
 
-https://github.com/openshift/origin-server/tree/master/cartridges/openshift-origin-cartridge-jbossas/README.md
+JAX-RS endpoint for receiving spot data from remote clients running CallsignSpotParserApp.
+
+Spots collected by the endpoint are sent to a JMS queue to be picked up for server-side
+processing and storage. Data stored is used by the Spot Vizualizer webapp to display
+spots on a map.
