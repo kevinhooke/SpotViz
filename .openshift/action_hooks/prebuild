@@ -1,2 +1,2 @@
 #add common jar to local repo - updated
-mvn install:install-file -DgeneratePom=true -Dfile=../../app-root/repo/SpotVisualizerCommon-0.0.1-SNAPSHOT.jar -DgroupId=kh.spotvisualizer -DartifactId=SpotVisualizerCommon -Dversion=0.0.1-SNAPSHOT -Dpackaging=jar
+mvn install:install-file -DgeneratePom=true -Dfile=../../SpotVisualizerCommon-0.0.1-SNAPSHOT.jar -DgroupId=kh.spotvisualizer -DartifactId=SpotVisualizerCommon -Dversion=0.0.1-SNAPSHOT -Dpackaging=jar
