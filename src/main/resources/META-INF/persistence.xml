@@ -19,11 +19,14 @@
             <property name="hibernate.ogm.datastore.provider" value="mongodb" /> 
 
 			<!-- this property is required, and not hibernate.ogm.mongodb.database per docs -->
-         	<property name="hibernate.ogm.datastore.database" value="testdb"/>
-            <!-- <property name="hibernate.ogm.mongodb.database" value="testdb"/> -->
+         	<property name="hibernate.ogm.datastore.database" value="callsignviz"/>
+            <!-- <property name="hibernate.ogm.mongodb.database" value="callsignviz"/> -->
  
+ 			<!-- host, port, userid and password are from env vars on OpenShift
+ 			See example config here https://github.com/hibernate/hibernate-demos/tree/master/hibernate-ogm/hiking-demo
         	<property name="hibernate.ogm.mongodb.host" value="127.0.0.1"/>
             <property name="hibernate.ogm.mongodb.port" value="27017"/>
+            -->
         </properties>
     </persistence-unit>
 </persistence>
