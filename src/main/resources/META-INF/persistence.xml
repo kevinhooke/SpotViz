@@ -19,7 +19,7 @@
             <property name="hibernate.ogm.datastore.provider" value="mongodb" /> 
 
 			<!-- this property is required, and not hibernate.ogm.mongodb.database per docs -->
-         	<property name="hibernate.ogm.datastore.database" value="callsignviz"/>
+         	<property name="hibernate.ogm.datastore.database" value="callsignviz2"/>
             <!-- <property name="hibernate.ogm.mongodb.database" value="callsignviz"/> -->
  
  			<!-- host, port, userid and password are from env vars on OpenShift
