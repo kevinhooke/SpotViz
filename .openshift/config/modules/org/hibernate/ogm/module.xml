@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ ~ Hibernate OGM, Domain model persistence for NoSQL datastores
+ ~
+ ~ License: GNU Lesser General Public License (LGPL), version 2.1 or later
+ ~ See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
+  -->
+<module xmlns="urn:jboss:module:1.1" name="org.hibernate" slot="ogm">
+    <resources>
+        <resource-root path="hibernate-ogm-core-4.1.0.Final.jar" />
+    </resources>
+    <dependencies>
+        <module name="org.hibernate" export="true" />
+        <module name="org.hibernate.commons-annotations" />
+        <module name="org.hibernate.hql" slot="1.1.0.Final" />
+        <module name="org.hibernate.search.orm" slot="5.0.0.Final" optional="true" />
+
+        <module name="javax.api" />
+        <module name="javax.persistence.api" />
+        <!-- Exporting as one of its types is exposed via Log which is extended in other modules -->
+        <module name="javax.transaction.api" export="true" />
+        <module name="javax.validation.api" />
+        <module name="org.dom4j" />
+        <module name="org.jboss.as.jpa.hibernate" slot="4" optional="true" />
+        <module name="org.jboss.logging" />
+
+        <!-- Allow Hibernate ORM to load com.arjuna.ats.jta.TransactionManager -->
+        <module name="org.jboss.jts" export="true" />
+    </dependencies>
+</module>
