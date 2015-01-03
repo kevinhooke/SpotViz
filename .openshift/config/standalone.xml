@@ -1,6 +1,5 @@
 <?xml version='1.0' encoding='UTF-8'?>
-
-<server xmlns="urn:jboss:domain:2.1">
+<server xmlns="urn:jboss:domain:2.2">
     <extensions>
         <extension module="org.jboss.as.clustering.infinispan"/>
         <extension module="org.jboss.as.clustering.jgroups"/>
@@ -113,11 +112,9 @@
             <logger category="jacorb.config">
                 <level name="ERROR"/>
             </logger>
-            
             <logger category="kh.callsign.spotcollector.mdb">
                 <level name="INFO"/>
             </logger>
-            
             <root-logger>
                 <level name="INFO"/>
                 <handlers>
@@ -379,6 +376,8 @@
         <subsystem xmlns="urn:jboss:domain:messaging:2.0">
             <hornetq-server>
                 <journal-file-size>102400</journal-file-size>
+                <thread-pool-max-size>${messaging.thread.pool.max.size}</thread-pool-max-size>
+                <scheduled-thread-pool-max-size>${messaging.scheduled.thread.pool.max.size}</scheduled-thread-pool-max-size>
                 <connectors>
                     <http-connector name="http-connector" socket-binding="http">
                         <param key="http-upgrade-endpoint" value="http-acceptor"/>
@@ -500,7 +499,7 @@
             </core-environment>
             <recovery-environment socket-binding="txn-recovery-environment" status-socket-binding="txn-status-manager"/>
         </subsystem>
-        <subsystem xmlns="urn:jboss:domain:undertow:1.1">
+        <subsystem xmlns="urn:jboss:domain:undertow:1.2">
             <buffer-cache name="default"/>
             <server name="default-server">
                 <http-listener name="default" socket-binding="http" proxy-address-forwarding="true"/>
@@ -512,6 +511,7 @@
             </server>
             <servlet-container name="default">
                 <jsp-config/>
+                <websockets/>
             </servlet-container>
             <handlers>
                 <file name="welcome-content" path="${jboss.home.dir}/welcome-content"/>
