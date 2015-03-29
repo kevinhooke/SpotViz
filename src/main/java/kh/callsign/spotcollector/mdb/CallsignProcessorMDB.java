@@ -2,12 +2,14 @@ package kh.callsign.spotcollector.mdb;
 
 import javax.ejb.ActivationConfigProperty;
 import javax.ejb.MessageDriven;
+import javax.inject.Inject;
 import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.MessageListener;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 
+import kh.callsign.spotcollector.service.CallsignProcessorService;
 import kh.radio.spotparser.domain.Spot;
 
 import org.apache.logging.log4j.LogManager;
@@ -21,8 +23,8 @@ public class CallsignProcessorMDB implements MessageListener{
 
 	private static final Logger LOG = LogManager.getLogger("kh.callsign.spotcollector.mdb");
 	
-	@PersistenceContext
-	private EntityManager em;
+	@Inject
+	private CallsignProcessorService service;
 	
 	@Override
 	public void onMessage(Message msg) {
@@ -33,8 +35,8 @@ public class CallsignProcessorMDB implements MessageListener{
 		try {
 			Spot spot = msg.getBody(Spot.class);
 			LOG.info("... spot received for time: " + spot.getTime());
-			
-			em.persist(spot);
+			this.service.process(spot);
+			LOG.info("... spot processed");
 			
 		} catch (JMSException e) {
 			// TODO Auto-generated catch block
