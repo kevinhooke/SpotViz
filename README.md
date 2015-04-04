@@ -1,6 +1,8 @@
 Callsignviz
 ===========
 
+4/4/15 updates
+
 JAX-RS endpoint for receiving spot data from remote clients running CallsignSpotParserApp.
 
 Spots collected by the endpoint are sent to a JMS queue to be picked up for server-side
