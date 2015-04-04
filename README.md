@@ -1,7 +1,7 @@
 Callsignviz
 ===========
 
-4/4/15 updates
+4/4/15 1:20pm updates
 
 JAX-RS endpoint for receiving spot data from remote clients running CallsignSpotParserApp.
 
