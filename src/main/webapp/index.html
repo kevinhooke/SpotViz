@@ -2,8 +2,8 @@
 <html ng-app="SpotVizApp">
 <head>
 	<meta charset="UTF-8">
-
 	<link href="css/bootstrap-3.3.4-dist/css/bootstrap.css" rel="stylesheet"/>
+	<link rel="stylesheet" href="css/callsignviz.css"/>
 
 	<!-- AngularJS ui-date -->
 	<link rel="stylesheet" href="bower_components/jquery-ui/themes/smoothness/jquery-ui.css"/>
@@ -21,32 +21,28 @@
 
 <body>
 
-<div class="container-fluid">
-
-	<div class="jumbotron">
-	  <h1>SpotViz</h1>
-	  <p>Historical visualization of received JT65/JT9 signals received by Amateur Radio operators 
-	  around the world.</p>
-		<p>By Kevin Hooke KK6DCT</p>
-	</div>
-
-<nav class="navbar navbar-default">
-<ul class="nav navbar-nav">
-<li><a href="">Home</a></li>
-<li><a href="">How to upload your spots</a></li>
-<li><a href="">About</a></li>
-<li><a href="">FAQ</a></li>
-</ul>
-</nav>
-
-
-	<div id="mainNavMenu" class="row">
-		<a href="index.html#/">Home</a> | <a href="index.html#/about">About</a> | <a href="index.html#/mapviz">Visualize</a> 
-	</div>
-
-	<div ng-view></div>
+	<div class="container-fluid">
 	
-</div>
+		<div id="myjumbotron" class="jumbotron">
+		  <h1>SpotViz</h1>
+		  <p>Historical visualization of received JT65/JT9 signals received by Amateur Radio operators 
+		  around the world.</p>
+			<p>By Kevin Hooke KK6DCT</p>
+		</div>
+	
+		<nav class="navbar navbar-default">
+			<ul class="nav navbar-nav">
+				<li><a href="index.html#/">Home</a></li>
+				<li><a href="index.html#/mapviz">Visualize!</a></li>
+				<li><a href="">How to upload your spots</a></li>
+				<li><a href="index.html#/about">About</a></li>
+				<li><a href="">FAQ</a></li>
+			</ul>
+		</nav>
+	
+		<div ng-view></div>
+		
+	</div>
 
 </body>
 </html>
