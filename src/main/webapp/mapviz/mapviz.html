@@ -1,47 +1,49 @@
-<div class="row" ng-controller="SpotVizController">
-	<form>
+<div ng-controller="SpotVizController">
 	<div class="row">
-		<div class="col-md-3">
-			<label for="callsign">Callsign</label>		
-		</div>
-		<div class="col-md-8">
-			<input id="callsign" type="text" ng-model="callsign"/>
-		</div>
+		<form>
+			<div class="row">
+				<div class="col-md-3">
+					<label for="callsign">Callsign</label>
+				</div>
+				<div class="col-md-8">
+					<input id="callsign" type="text" ng-model="callsign" />
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-md-3">
+					<label for="fromDate">Staring from date:</label>
+				</div>
+				<div class="col-md-8">
+					<input id="fromDate" ng-model="fromDate" ui-date-format="yy/mm/dd"
+						ui-date />
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-md-3">
+					<label for="toDate">Ending at date:</label>
+				</div>
+				<div class="col-md-8">
+					<input id="toDate" ng-model="toDate" ui-date-format="yy/mm/dd"
+						ui-date />
+				</div>
+			</div>
+
+			<div class="row">
+				<div class="col-md-3">
+					<button class="btn btn-default btn-primary" ng-click="retrieve()">Show
+						data</button>
+				</div>
+				<div class="col-md-9">{{msg}}</div>
+			</div>
+		</form>
 	</div>
-	<div class="row">
-		<div class="col-md-3">
-			<label for="fromDate">Staring from date:</label>		
-		</div>
-		<div class="col-md-8">
-			<input id="fromDate" ng-model="fromDate" ui-date-format="yy/mm/dd" ui-date/>
-		</div>
-	</div>
-	<div class="row">
-		<div class="col-md-3">
-			<label for="toDate">Ending at date:</label>		
-		</div>
-		<div class="col-md-8">
-			<input id="toDate" ng-model="toDate" ui-date-format="yy/mm/dd" ui-date/>
-		</div>
-	</div>
-	
-	<div class="row">
-		<div class="col-md-3">
-			<button class="btn btn-default btn-primary" ng-click="retrieve()">Show data</button>			
-		</div>
-		<div class="col-md-9">
-			{{msg}}
-		</div>
-	</div>
-	</form>
+
+	<p>{{debugMsg}}</p>
+
+	<ul>
+		<li ng-repeat="spot in spots"><span>{{spot.spotter}} :
+				{{spot.word1}} {{spot.word2}} {{spot.word3}} </span></li>
+	</ul>
+
 </div>
-
-<p>{{debugMsg}}</p>
-
-<ul>
-    <li ng-repeat="spot in spots">
-      <span>{{spot.spotter}} : {{spot.word1}} {{spot.word2}} {{spot.word3}} </span>
-    </li>
-</ul>
-
 </div>
