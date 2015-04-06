@@ -2,6 +2,7 @@ var spotVizApp = angular.module('SpotVizApp',
 	[
 	 	"ngRoute",
 	 	"ui.date",
+	 	"uiGmapgoogle-maps",
 	 	"SpotVizControllers"
 	]);
 
@@ -26,3 +27,11 @@ spotVizApp.config(['$routeProvider',
         });
     }]);
 
+spotVizApp.config(function(uiGmapGoogleMapApiProvider) {
+    uiGmapGoogleMapApiProvider.configure({
+        //use key for prod server
+    	//key: 'AIzaSyC3qPMWNCibTkiKlNpCeU3zO0pRjU-iClU',
+        v: '3.17',
+        libraries: 'weather,geometry,visualization'
+    });
+})

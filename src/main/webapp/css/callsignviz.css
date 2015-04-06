@@ -13,4 +13,27 @@
 #myjumbotron p {
 	font-size:16px;
 }
+	
+	
+/* Sticky footer from Bootrap example: 
+http://getbootstrap.com/examples/sticky-footer/sticky-footer.css
+*/
+html {
+  position: relative;
+  min-height: 100%;
+}
+body {
+  /* Margin bottom by footer height */
+  margin-bottom: 20px;
+}
+.footer {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  /* Set the fixed height of the footer here */
+  height: 80px;
+  background-color: #f5f5f5;
+}
+
+.angular-google-map-container { height: 450px; }
 		

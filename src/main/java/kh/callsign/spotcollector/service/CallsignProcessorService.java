@@ -1,10 +1,16 @@
 package kh.callsign.spotcollector.service;
 
+import java.util.Date;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 
 import kh.callsign.spotcollector.data.CallsignProcessorDao;
+import kh.hamqthclient.HamQTHClient;
+import kh.hamqthclient.xml.HamQTHSearch;
+import kh.hamqthclient.xml.Search;
 import kh.radio.spotparser.domain.Spot;
+import kh.radio.spotparser.domain.SpotDetail;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -17,6 +23,16 @@ public class CallsignProcessorService {
 	
 	@Inject
 	private CallsignProcessorDao dao;
+	
+	private HamQTHClient hamQTHClient;
+	
+	public CallsignProcessorService(){
+		this.hamQTHClient = new HamQTHClient();
+		
+		//TODO: logon session last for 1 hour. If we call the api and get an error
+		//we need to re-logon. Need to add/test this behavior.
+		this.hamQTHClient.logon();
+	}
 	
 	/**
 	 * 
@@ -31,7 +47,32 @@ public class CallsignProcessorService {
 			
 			LOGGER.debug("... new spot: processing");
 			
-			//if new, store
+			//CQ MYCALL GRID
+			//HISCALL MYCALL GRID
+			//HISCALL MYCALL REPORT (*2 either way)
+			//HISCALL MYCALL RRR
+			//HISCALL MYCALL 73
+			
+			HamQTHSearch searchResult = this.hamQTHClient.lookupCallsign(spot.getWord2());
+			Search search = searchResult.getSearch();
+
+			//update spot with geo info
+			SpotDetail detail = new SpotDetail();
+			detail.setDateLastProcessed(new Date());
+			
+			//TODO: need to check for an error message here
+			if(search.getLatitude() != null){
+				detail.setErrorMessage("success");
+				detail.setLatitude(search.getLatitude());
+				detail.setLongitude(search.getLongitude());
+			}
+			else{
+				detail.setStatus("error");
+				detail.setErrorMessage("No lat/long info");
+			}
+			
+			spot.setSpotDetail(detail);
+			//store the new spot data
 			this.dao.store(spot);
 			
 			//lookup location via HamQTH
