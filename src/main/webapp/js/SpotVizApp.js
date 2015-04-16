@@ -3,7 +3,8 @@ var spotVizApp = angular.module('SpotVizApp',
 	 	"ngRoute",
 	 	"ui.date",
 	 	"uiGmapgoogle-maps",
-	 	"SpotVizControllers"
+	 	"SpotVizControllers",
+	 	"DateControllers"
 	]);
 
 

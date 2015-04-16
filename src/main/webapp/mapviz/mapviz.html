@@ -38,8 +38,9 @@
 				</div>
 			</form>
 		</div>
-		<div clas="col-md-9">
+		<div class="col-md-9">
 			<div class="row">
+			<div ng-include src="'mapviz/dateControls.html'">here</div>
 				<p>{{debugMsg}}</p>
 
 				<ul>
@@ -48,6 +49,9 @@
 							{{spot.spotDetail.errorMessage}} {{spot.spotDetail.longitude}}
 							{{spot.spotDetail.longitude}}</span></li>
 				</ul>
+			</div>
+			
+			<div class="row">
 				<div class="col-md-9">{{msg}}</div>
 			</div>
 			
@@ -61,5 +65,4 @@
 			
 		</div>
 	</div>
-</div>
 </div>
