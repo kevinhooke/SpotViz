@@ -1,23 +1,25 @@
 <div ng-controller="SpotVizController">
 
 	<div class="row">
-		<div class="col-md-3">
+		<div class="col-md-3 form-group" >
 			<form>
 				<div class="row">
 					<div class="col-md-3">
 						<label for="callsign">Callsign</label>
 					</div>
 					<div class="col-md-8">
-						<input id="callsign" type="text" ng-model="callsign" />
+						<input id="callsign" class="form-control" type="text" ng-model="callsign" />
 					</div>
 				</div>
 				<div class="row">
 					<div class="col-md-3">
-						<label for="fromDate">Staring from date:</label>
+						<label for="fromDate">Staring from date/time:</label>
 					</div>
 					<div class="col-md-8">
-						<input id="fromDate" ng-model="fromDate" ui-date-format="yy/mm/dd"
+						<input id="fromDate" class="form-control" ng-model="fromDate" ui-date-format="yy/mm/dd"
 							ui-date />
+                                                <timepicker ng-model="fromTime" minute-step="minuteStep"></timepicker>
+
 					</div>
 				</div>
 				<div class="row">
@@ -25,9 +27,10 @@
 						<label for="toDate">Ending at date:</label>
 					</div>
 					<div class="col-md-8">
-						<input id="toDate" ng-model="toDate" ui-date-format="yy/mm/dd"
+						<input id="toDate" class="form-control" ng-model="toDate" ui-date-format="yy/mm/dd"
 							ui-date />
-					</div>
+                                                <timepicker ng-model="toTime" minute-step="minuteStep"></timepicker>
+                                        </div>
 				</div>
 
 				<div class="row">
@@ -52,7 +55,7 @@
 			</div>
 			
 			<div class="row">
-				<div class="col-md-9">{{msg}}</div>
+				<div class="col-md-9"><alert ng-show="msg">{{msg}}</alert></div>
 			</div>
 			
 			<div class="row" >

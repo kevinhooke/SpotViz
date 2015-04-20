@@ -33,11 +33,17 @@
 				<button class="btn btn-primary" data-ng-click="stop()">
 					<span class="glyphicon glyphicon-pause" aria-hidden="true"></span>Pause
 				</button>
-				State: {{state}}
+				State: {{state}} / current progress value: {{currentValue}}
 			<p>
-		</div>
+		</div>		
 	</div>
-
+	
+	<div class="row">
+	
+			<div class="col-sm-12">
+				<progressbar max="maxValue" value="currentValue" type="info"></progressbar>
+			</div>
+	</div>
 
 </div>
 

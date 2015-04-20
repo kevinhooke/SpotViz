@@ -3,7 +3,9 @@ package kh.callsign.spotcollector.endpoint;
 import java.net.UnknownHostException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 
 import javax.enterprise.context.RequestScoped;
 import javax.ws.rs.GET;
@@ -17,10 +19,12 @@ import javax.ws.rs.core.Response.Status;
 
 import kh.mongo.MongoConnection;
 
+import com.mongodb.AggregationOutput;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DB;
 import com.mongodb.DBCollection;
 import com.mongodb.DBCursor;
+import com.mongodb.DBObject;
 import com.mongodb.util.JSON;
 
 @RequestScoped
@@ -55,7 +59,8 @@ public class SpotDataEndpoint {
 	}
 
 	/**
-	 * Returns spots for given spotter callsign within date range
+	 * Returns spots for given spotter callsign within date range. If no date
+	 * range passed, return a summary for the given callsign.
 	 * 
 	 * @return
 	 */
@@ -72,6 +77,8 @@ public class SpotDataEndpoint {
 			DB db = MongoConnection.getMongoDB();
 			DBCollection col = db.getCollection("Spot");
 			DBCursor c = null;
+			String jsonString = null;
+
 			if (callsign == null) {
 				c = col.find().sort(new BasicDBObject("spotReceivedTimestamp", -1)).limit(10);
 			} else {
@@ -83,15 +90,18 @@ public class SpotDataEndpoint {
 					if (fromDate != null && toDate != null) {
 						fromDateParsed = dateFormatter.parse(fromDate);
 						toDateParsed = dateFormatter.parse(toDate);
-						query.append("spotReceivedTimestamp", new BasicDBObject("$gte", 
+						query.append("spotReceivedTimestamp", new BasicDBObject("$gte",
 								fromDateParsed).append("$lt", toDateParsed));
+						c = col.find(query).sort(new BasicDBObject("spotReceivedTimestamp", -1))
+								.limit(10);
+
+						JSON json = new JSON();
+						jsonString = json.serialize(c);
+
+					} else {
+						jsonString = this.retrieveSpotSummaryForCallsign(col, callsign);
 					}
 
-					c = col.find(query).sort(new BasicDBObject("spotReceivedTimestamp", -1))
-							.limit(10);
-
-					JSON json = new JSON();
-					String jsonString = json.serialize(c);
 					response = Response.status(Status.OK).entity(jsonString).build();
 				} catch (ParseException dfe) {
 					response = Response.status(Status.INTERNAL_SERVER_ERROR)
@@ -105,5 +115,30 @@ public class SpotDataEndpoint {
 
 		return response;
 
+	}
+
+	private String retrieveSpotSummaryForCallsign(DBCollection col, String callsign) {
+		String jsonResult = null;
+		//$match
+		DBObject match = new BasicDBObject("$match", new BasicDBObject("spotter", callsign));
+		
+		//$group
+		DBObject groupFields = new BasicDBObject( "_id", "$spotter");
+		groupFields.put("firstSpot", new BasicDBObject( "$min", "$spotReceivedTimestamp"));
+		groupFields.put("lastSpot", new BasicDBObject( "$max", "$spotReceivedTimestamp"));
+		groupFields.put("totalSpots", new BasicDBObject( "$sum", 1));
+		DBObject group = new BasicDBObject("$group", groupFields);
+		
+		List<DBObject> pipeline = Arrays.asList(match, group);
+		
+		AggregationOutput output = col.aggregate(pipeline);
+		for (DBObject result : output.results()) {
+			jsonResult = JSON.serialize(result);
+		    break;
+		}
+		if(jsonResult == null){
+			jsonResult = "{}";
+		}
+		return jsonResult;
 	}
 }

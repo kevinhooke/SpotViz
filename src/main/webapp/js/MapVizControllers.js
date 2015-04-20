@@ -3,6 +3,9 @@ var spotVizControllers = angular.module('SpotVizControllers', []);
 spotVizControllers.controller('SpotVizController', function($scope, $http,
 		uiGmapGoogleMapApi) {
 
+    $scope.minuteStep = 15;
+    $scope.markers = [];
+    
 	$scope.map = {
 		center : {
 			latitude : 39.8,
@@ -10,8 +13,26 @@ spotVizControllers.controller('SpotVizController', function($scope, $http,
 		},
 		zoom : 4
 	};
-	$scope.markers = [];
 
+	$scope.retrieveSpotSummaryForCallsign = function() {
+		url = "/spotviz/spotdata/spots/" + $scope.callsign;
+		$http.get(url).success(function(data) {
+			if (data == "") {
+				$scope.msg = "No data for callsign: " + $scope.callsign;
+				$scope.numberOfSpots = 0;
+
+				$scope.spots = "";
+				$scope.markers = [];
+			} else {
+				//TODO
+				$scope.numberOfSpots = 0;
+				$scope.dateFirstSpot = new Date();
+				$scope.dateLastSpot = new Date();
+			}
+			
+		});
+	}
+	
 	$scope.retrieve = function() {
 		url = "/spotviz/spotdata/spots/" + $scope.callsign + "?fromdate="
 				+ $scope.fromDate + "&todate=" + $scope.toDate;

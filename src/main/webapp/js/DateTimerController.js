@@ -8,6 +8,13 @@ variableDateApp.controller('VariableRateDateCtrl', function ($scope, $interval) 
     $scope.timeInterval = 30; //how many minutes the date advances on each iteration
     $scope.state = "Stopped";
 
+    //progress bar
+    $scope.maxValue=10;
+    $scope.currentValue=1;
+    
+    //TODO: calc number of steps between start and stop based on timeInterval - used this
+    //to set the maxValue. currentValue = number of steps currently passed since start.
+    
     $scope.start = function () {
         //if already running, do nothing
         if (runningCounter != null) {
@@ -18,6 +25,7 @@ variableDateApp.controller('VariableRateDateCtrl', function ($scope, $interval) 
 
             runningCounter = $interval(function () {
                 $scope.date = moment($scope.date).add($scope.timeInterval, 'minutes');
+                $scope.currentValue = $scope.currentValue + 1;
             }, 1000 * $scope.updateRate, $scope.iterations);
         }
     }
