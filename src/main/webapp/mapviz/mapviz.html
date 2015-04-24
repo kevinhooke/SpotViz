@@ -8,7 +8,8 @@
 						<label for="callsign">Callsign</label>
 					</div>
 					<div class="col-md-8">
-						<input id="callsign" class="form-control" type="text" ng-model="callsign" />
+						<input id="callsign" class="form-control" type="text" 
+						ng-model="callsign" ng-blur="retrieveSpotSummaryForCallsign()"/>
 					</div>
 				</div>
 				<div class="row">
@@ -43,7 +44,7 @@
 		</div>
 		<div class="col-md-9">
 			<div class="row">
-			<div ng-include src="'mapviz/dateControls.html'">here</div>
+				
 				<p>{{debugMsg}}</p>
 
 				<ul>
@@ -58,9 +59,23 @@
 				<div class="col-md-9"><alert ng-show="msg">{{msg}}</alert></div>
 			</div>
 			
-			<div class="row" >
+			<div class="row" ng-show="numberOfSpots > 0">
+				<div class="col-md-offset-2 col-md-3">
+				<p>Spots by callsign [{{callsign}}] in database: {{numberOfSpots}}</p>
+				</div>
+				<div class="col-md-3">
+					<p>Earliest recorded spot: {{dateFirstSpot}}</p>
+				</div>
+				<div class="col-md-3">
+					<p>Most recent recorded spot: {{dateLastSpot}}</p>
+				</div>
+			
+			</div>
+			
+			<div class="row" ng-if="showMap">
+				<div ng-include src="'mapviz/dateControls.html'"></div>
 				<div class="angular-google-map-container">
-					<ui-gmap-google-map center='map.center' zoom='map.zoom'>
+					<ui-gmap-google-map center='map.center' zoom='map.zoom' refresh="showMap">
 						<ui-gmap-markers models="markers" coords="'self'" icon="'icon'"/>
 					</ui-gmap-google-map>
 				</div>

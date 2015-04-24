@@ -3,42 +3,53 @@ var spotVizControllers = angular.module('SpotVizControllers', []);
 spotVizControllers.controller('SpotVizController', function($scope, $http,
 		uiGmapGoogleMapApi) {
 
+	//toggle for showing map after form values submitted
+	$scope.showMap = false;
+	
     $scope.minuteStep = 15;
     $scope.markers = [];
     
 	$scope.map = {
+		//TODO: center map on spotter's QTH?
 		center : {
 			latitude : 39.8,
 			longitude : -98.5
 		},
 		zoom : 4
 	};
-
+        
 	$scope.retrieveSpotSummaryForCallsign = function() {
 		url = "/spotviz/spotdata/spots/" + $scope.callsign;
 		$http.get(url).success(function(data) {
-			if (data == "") {
-				$scope.msg = "No data for callsign: " + $scope.callsign;
+			console.log('data: ' + data )
+			if (Object.keys(data) == 0 ) {
+				$scope.msg = "Sorry, there's no spot data currently uploaded for callsign [" 
+					+ $scope.callsign + "]. Click the link 'How to upload your spots' (TODO) for" +
+							"instructions on how to upload your received spot data for visualzation.";
+				
 				$scope.numberOfSpots = 0;
-
 				$scope.spots = "";
 				$scope.markers = [];
 			} else {
-				//TODO
-				$scope.numberOfSpots = 0;
-				$scope.dateFirstSpot = new Date();
-				$scope.dateLastSpot = new Date();
+				//TODO: default first date and last date should be set on date pickers
+				$scope.msg = '';
+				$scope.numberOfSpots = data.totalSpots;
+				$scope.dateFirstSpot = data.firstSpot;
+				$scope.dateLastSpot = data.lastSpot;
 			}
 			
 		});
 	}
 	
+	/*
+	 * Retrieves spots for given callsign and date range.
+	 */
 	$scope.retrieve = function() {
 		url = "/spotviz/spotdata/spots/" + $scope.callsign + "?fromdate="
 				+ $scope.fromDate + "&todate=" + $scope.toDate;
 		$scope.debugMsg = "url is:" + url;
 		$http.get(url).success(function(data) {
-			if (data == "") {
+			if (data == {}) {
 				$scope.msg = "No data for callsign: " + $scope.callsign;
 				$scope.spots = "";
 				$scope.markers = [];
@@ -57,6 +68,7 @@ spotVizControllers.controller('SpotVizController', function($scope, $http,
 						title : data[i].word2
 					});
 				}
+				$scope.showMap = true;
 			}
 		}).error(function(data) {
 			$scope.msg = "Failed to retrieve data at this time. Try later?";
