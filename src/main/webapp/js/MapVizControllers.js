@@ -9,6 +9,10 @@ spotVizControllers.controller('SpotVizController', function($scope, $http,
     $scope.minuteStep = 15;
     $scope.markers = [];
     
+    //default from and to date options
+    $scope.fromDateOptions = null;
+    $scope.toDateOptions = null;
+    
 	$scope.map = {
 		//TODO: center map on spotter's QTH?
 		center : {
@@ -34,8 +38,24 @@ spotVizControllers.controller('SpotVizController', function($scope, $http,
 				//TODO: default first date and last date should be set on date pickers
 				$scope.msg = '';
 				$scope.numberOfSpots = data.totalSpots;
-				$scope.dateFirstSpot = data.firstSpot;
-				$scope.dateLastSpot = data.lastSpot;
+				$scope.dateFirstSpot = data.firstSpot.$date;
+				$scope.fromDate = $scope.dateFirstSpot;
+				console.log("firstSpot: " + data.firstSpot.$date);
+				//parse returned ISODate from MongoDB as a String
+				//firstSpotDate = moment(data.firstSpot, "YYYY-MM-DDTHH:mm:ss.SSS").toDate();
+				//console.log("firstSpotDate: " + firstSpotDate);
+				lastSpotDate = moment(data.lastSpot.$date).add(1, 'days').toDate();
+				$scope.toDate = lastSpotDate;
+				$scope.fromDateOptions = {
+					minDate: new Date(data.firstSpot.$date),
+					maxDate: lastSpotDate
+				};
+				$scope.dateLastSpot = data.lastSpot.$date;
+				
+				$scope.toDateOptions = {
+						minDate: new Date(data.firstSpot.$date),
+						maxDate: lastSpotDate
+					};
 			}
 			
 		});
