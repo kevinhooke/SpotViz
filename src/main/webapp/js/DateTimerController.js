@@ -26,6 +26,12 @@ variableDateApp.controller('VariableRateDateCtrl', function ($scope, $interval) 
             runningCounter = $interval(function () {
                 $scope.date = moment($scope.date).add($scope.timeInterval, 'minutes');
                 $scope.currentValue = $scope.currentValue + 1;
+                
+                //get subset of spots from currentStartDatePos upto +interval length
+                //add to var for display
+                
+                //or calc start and end pos in an array and use these for offset for playback
+                
             }, 1000 * $scope.updateRate, $scope.iterations);
         }
     }

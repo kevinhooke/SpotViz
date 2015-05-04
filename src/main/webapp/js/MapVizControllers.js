@@ -22,6 +22,9 @@ spotVizControllers.controller('SpotVizController', function($scope, $http,
 		zoom : 4
 	};
         
+	/*
+	 * Retrieves a summary of spots for the currently entered callsign. 
+	 */
 	$scope.retrieveSpotSummaryForCallsign = function() {
 		url = "/spotviz/spotdata/spots/" + $scope.callsign;
 		$http.get(url).success(function(data) {
@@ -35,15 +38,15 @@ spotVizControllers.controller('SpotVizController', function($scope, $http,
 				$scope.spots = "";
 				$scope.markers = [];
 			} else {
-				//TODO: default first date and last date should be set on date pickers
+				//TODO: setting default from and to dates are not in expected format, but selecting from
+				//picker is in correct format
 				$scope.msg = '';
 				$scope.numberOfSpots = data.totalSpots;
 				$scope.dateFirstSpot = data.firstSpot.$date;
+				//$scope.fromDate = moment($scope.dateFirstSpot).format("mm/DD/YYYY").toDate();
 				$scope.fromDate = $scope.dateFirstSpot;
-				console.log("firstSpot: " + data.firstSpot.$date);
-				//parse returned ISODate from MongoDB as a String
-				//firstSpotDate = moment(data.firstSpot, "YYYY-MM-DDTHH:mm:ss.SSS").toDate();
-				//console.log("firstSpotDate: " + firstSpotDate);
+
+				//lastSpotDate = moment(data.lastSpot.$date).add(1, 'days').format("mm/DD/YYYY").toDate();
 				lastSpotDate = moment(data.lastSpot.$date).add(1, 'days').toDate();
 				$scope.toDate = lastSpotDate;
 				$scope.fromDateOptions = {
@@ -65,8 +68,13 @@ spotVizControllers.controller('SpotVizController', function($scope, $http,
 	 * Retrieves spots for given callsign and date range.
 	 */
 	$scope.retrieve = function() {
+		var fromTimeOnly = moment($scope.fromTime).format("HH:mm:ss");
+		var toTimeOnly = moment($scope.toTime).format("HH:mm:ss");
 		url = "/spotviz/spotdata/spots/" + $scope.callsign + "?fromdate="
-				+ $scope.fromDate + "&todate=" + $scope.toDate;
+				+ $scope.fromDate + "T" + fromTimeOnly + "Z" + "&todate=" + $scope.toDate 
+				+ "T" + toTimeOnly + "Z";
+		
+		
 		$scope.debugMsg = "url is:" + url;
 		$http.get(url).success(function(data) {
 			if (data == {}) {

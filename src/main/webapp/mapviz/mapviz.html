@@ -1,15 +1,15 @@
 <div ng-controller="SpotVizController">
 
 	<div class="row">
-		<div class="col-md-3 form-group" >
+		<div class="col-md-3 form-group">
 			<form>
 				<div class="row">
 					<div class="col-md-3">
 						<label for="callsign">Callsign</label>
 					</div>
 					<div class="col-md-8">
-						<input id="callsign" class="form-control" type="text" 
-						ng-model="callsign" ng-blur="retrieveSpotSummaryForCallsign()"/>
+						<input id="callsign" class="form-control" type="text"
+							ng-model="callsign" ng-blur="retrieveSpotSummaryForCallsign()" />
 					</div>
 				</div>
 				<div class="row">
@@ -17,10 +17,9 @@
 						<label for="fromDate">Staring from date/time:</label>
 					</div>
 					<div class="col-md-8">
-						<input id="fromDate" class="form-control" ng-model="fromDate" ui-date-format="yy/mm/dd"
-							ui-date="fromDateOptions" />
-                                                <timepicker ng-model="fromTime" minute-step="minuteStep"></timepicker>
-
+						<input id="fromDate" class="form-control" ng-model="fromDate"
+							ui-date-format="yy'-'mm'-'dd" ui-date="fromDateOptions" />
+						<timepicker ng-model="fromTime" minute-step="minuteStep"></timepicker>
 					</div>
 				</div>
 				<div class="row">
@@ -28,10 +27,10 @@
 						<label for="toDate">Ending at date:</label>
 					</div>
 					<div class="col-md-8">
-						<input id="toDate" class="form-control" ng-model="toDate" ui-date-format="yy/mm/dd"
-							ui-date="toDateOptions" />
-                                                <timepicker ng-model="toTime" minute-step="minuteStep"></timepicker>
-                                        </div>
+						<input id="toDate" class="form-control" ng-model="toDate"
+							ui-date-format="yy'-'mm'-'dd" ui-date="toDateOptions" />
+						<timepicker ng-model="toTime" minute-step="minuteStep"></timepicker>
+					</div>
 				</div>
 
 				<div class="row">
@@ -44,7 +43,7 @@
 		</div>
 		<div class="col-md-9">
 			<div class="row">
-				
+
 				<p>{{debugMsg}}</p>
 
 				<ul>
@@ -54,14 +53,17 @@
 							{{spot.spotDetail.longitude}}</span></li>
 				</ul>
 			</div>
-			
+
 			<div class="row">
-				<div class="col-md-9"><alert ng-show="msg">{{msg}}</alert></div>
+				<div class="col-md-9">
+					<alert ng-show="msg">{{msg}}</alert>
+				</div>
 			</div>
-			
+
 			<div class="row" ng-show="numberOfSpots > 0">
 				<div class="col-md-offset-2 col-md-3">
-				<p>Spots by callsign [{{callsign}}] in database: {{numberOfSpots}}</p>
+					<p>Spots by callsign [{{callsign}}] in database:
+						{{numberOfSpots}}</p>
 				</div>
 				<div class="col-md-3">
 					<p>Earliest recorded spot: {{dateFirstSpot}}</p>
@@ -69,18 +71,18 @@
 				<div class="col-md-3">
 					<p>Most recent recorded spot: {{dateLastSpot}}</p>
 				</div>
-			
+
 			</div>
-			
+
 			<div class="row" ng-if="showMap">
 				<div ng-include src="'mapviz/dateControls.html'"></div>
 				<div class="angular-google-map-container">
-					<ui-gmap-google-map center='map.center' zoom='map.zoom' refresh="showMap">
-						<ui-gmap-markers models="markers" coords="'self'" icon="'icon'"/>
-					</ui-gmap-google-map>
+					<ui-gmap-google-map center='map.center' zoom='map.zoom'
+						refresh="showMap"> <ui-gmap-markers
+						models="markers" coords="'self'" icon="'icon'" /> </ui-gmap-google-map>
 				</div>
 			</div>
-			
+
 		</div>
 	</div>
 </div>

@@ -38,6 +38,13 @@
 		</dependency>
 
 		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>4.12</version>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
 			<groupId>kh.spotvisualizer</groupId>
 			<artifactId>SpotVisualizerCommon</artifactId>
 			<version>0.0.1-SNAPSHOT</version>
