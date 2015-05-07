@@ -2,6 +2,7 @@ var variableDateApp = angular.module('DateControllers', []);
 variableDateApp.controller('VariableRateDateCtrl', function ($scope, $interval) {
 
     var runningCounter = null;
+    $scope.debugMsg = null;
     $scope.iterations = 0; //number of times the interval runs, 0 = continuous
     $scope.date = moment();
     $scope.updateRate = 1; //number of seconds betweeb updates
@@ -12,8 +13,7 @@ variableDateApp.controller('VariableRateDateCtrl', function ($scope, $interval) 
     $scope.maxValue=10;
     $scope.currentValue=1;
     
-    //TODO: calc number of steps between start and stop based on timeInterval - used this
-    //to set the maxValue. currentValue = number of steps currently passed since start.
+    
     
     $scope.start = function () {
         //if already running, do nothing
@@ -22,15 +22,45 @@ variableDateApp.controller('VariableRateDateCtrl', function ($scope, $interval) 
         }
         else {
             $scope.state = "Running";
-
+            var intervalBoundaries = [];
+            
+            //calc difference in minutes: selectedEndDateTime - selectedStartDateTime
+            var startMoment = moment.utc($scope.selectedStartDateTime);
+            var endMoment = moment.utc($scope.selectedEndDateTime);
+            var totalMinutesInSelectedTimeRange = (endMoment.subtract(startMoment)).minutes();
+            $scope.debugMsg = "Minutes: " + totalMinutesInSelectedTimeRange;
+            
+            // totalMinutesInSelectedTimeRange / $scope.timeInterval
+            var numberOfIntervalsInSelectedRange = 
+            	Math.ceil(totalMinutesInSelectedTimeRange / $scope.timeInterval);
+            $scope.debugMsg = $scope.debugMsg + " / intervals: " + numberOfIntervalsInSelectedRange;
+            
+            //calc array of interval start and end times between selected start and end
+            var tempIntervalCount = 0;
+            var currentIntervalStartDate = moment.utc(startMoment);
+        	var currentIntervalEndDate = null;
+            while(tempIntervalCount < numberOfIntervalsInSelectedRange){
+            	//first time through tempIntervalCount=0 so no minutes are added to the start date
+            	//time operations modify the original value
+            	currentIntervalStartDate.add((tempIntervalCount * $scope.timeInterval), 'minutes');
+            	//TODO: need to check time ranges are inclusive and we don't loose anything in a gap
+            	currentIntervalEndDate = moment.utc(currentIntervalStartDate);
+            	currentIntervalEndDate.add($scope.timeInterval, 'minutes');
+            	
+            	intervalBoundaries[tempIntervalCount] = {
+            			intervalStartDate : currentIntervalStartDate,
+            			intervalEndDate : currentIntervalEndDate
+            	};
+            	
+            	tempIntervalCount++;
+            }
+            
             runningCounter = $interval(function () {
                 $scope.date = moment($scope.date).add($scope.timeInterval, 'minutes');
                 $scope.currentValue = $scope.currentValue + 1;
-                
-                //get subset of spots from currentStartDatePos upto +interval length
-                //add to var for display
-                
-                //or calc start and end pos in an array and use these for offset for playback
+                                
+                //TODO: within interval, use current interval as index to array of start and end to
+                //select range of spots for this interval for display
                 
             }, 1000 * $scope.updateRate, $scope.iterations);
         }

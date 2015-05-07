@@ -6,10 +6,14 @@ spotVizControllers.controller('SpotVizController', function($scope, $http,
 	//toggle for showing map after form values submitted
 	$scope.showMap = false;
 	
+	//selected start and end dates and times, combined
+	$scope.selectedStartDateTime = null;
+	$scope.selectedEndDateTime = null;
+	
     $scope.minuteStep = 15;
     $scope.markers = [];
     
-    //default from and to date options
+    //default from and to date options for date pickers
     $scope.fromDateOptions = null;
     $scope.toDateOptions = null;
     
@@ -70,9 +74,13 @@ spotVizControllers.controller('SpotVizController', function($scope, $http,
 	$scope.retrieve = function() {
 		var fromTimeOnly = moment($scope.fromTime).format("HH:mm:ss");
 		var toTimeOnly = moment($scope.toTime).format("HH:mm:ss");
-		url = "/spotviz/spotdata/spots/" + $scope.callsign + "?fromdate="
-				+ $scope.fromDate + "T" + fromTimeOnly + "Z" + "&todate=" + $scope.toDate 
-				+ "T" + toTimeOnly + "Z";
+		$scope.selectedStartDateTime = $scope.fromDate + "T" + fromTimeOnly + "Z";
+		$scope.selectedEndDateTime = $scope.toDate + "T" + toTimeOnly + "Z";
+		
+		
+		url = "/spotviz/spotdata/spots/" + $scope.callsign 
+			+ "?fromdate=" + $scope.selectedStartDateTime 
+			+ "&todate=" + $scope.selectedEndDateTime;
 		
 		
 		$scope.debugMsg = "url is:" + url;
