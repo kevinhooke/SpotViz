@@ -1,9 +1,10 @@
 describe('Date service', function () {
     var dateService;
-
+    
     beforeAll(function () {
         var $injector = angular.injector(['SpotVizApp.services']);
         dateService = $injector.get('dateService');
+        
     });
 
     it('Should be 2 itervals of 15 between 2015-01-01T19:00 and 2015-01-01T19:31 (fractional interval)', function () {

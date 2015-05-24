@@ -1,6 +1,5 @@
 
-<div class="container-fluid" ng-app="VariableDateApp"
-	ng-controller="VariableRateDateCtrl">
+<div class="container-fluid">
 
 	<div class="row">
 		<div class="col-sm-6">
@@ -33,7 +32,7 @@
 				<button class="btn btn-primary" data-ng-click="stop()">
 					<span class="glyphicon glyphicon-pause" aria-hidden="true"></span>Pause
 				</button>
-				State: {{state}} / current progress value: {{currentValue}} / 
+				State: {{state}} / current playback interval: {{currentInterval}} / 
 				Debug: {{debugMsg}} 
 			<p>
 		</div>		
@@ -41,7 +40,7 @@
 	
 	<div class="row">
 			<div class="col-sm-12">
-				<progressbar max="maxValue" value="currentValue" type="info"></progressbar>
+				<progressbar max="maxValue" value="currentInterval" type="info"></progressbar>
 			</div>
 			<div></div><div></div>
 	</div>
