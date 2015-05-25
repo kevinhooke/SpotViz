@@ -1,6 +1,7 @@
 var spotVizApp = angular.module('SpotVizApp', 
 	[
 	 	"ngRoute",
+	 	"ngAnimate",
 	 	"ui.date",
 	 	"ngMap",
 	 	"ui.bootstrap",
@@ -19,6 +20,12 @@ spotVizApp.config(['$routeProvider',
           templateUrl: 'mapviz/mapviz.html',
           controller: 'SpotVizController'
         }).
+        when('/upload', {
+          templateUrl: 'howToUpload.html'
+        }).        
+        when('/faq', {
+            templateUrl: 'faq.html'
+          }).
         when('/about', {
           templateUrl: 'about.html',
           controller: 'AboutController'

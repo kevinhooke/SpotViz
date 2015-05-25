@@ -9,7 +9,9 @@
 					</div>
 					<div class="col-md-8">
 						<input id="callsign" class="form-control" type="text"
-							ng-model="callsign" ng-blur="retrieveSpotSummaryForCallsign()" />
+							ng-model="callsign" ng-blur="retrieveSpotSummaryForCallsign()" 
+							popover="Enter a callsign whose uploaded reception spots you want to visualize"  
+							popover-placement="right" popover-trigger="focus"/>
 					</div>
 				</div>
 				<div class="row">
@@ -18,7 +20,11 @@
 					</div>
 					<div class="col-md-8">
 						<input id="fromDate" class="form-control" ng-model="fromDate"
-							ui-date-format="yy'-'mm'-'dd" ui-date="fromDateOptions" />
+							ui-date-format="yy'-'mm'-'dd" ui-date="fromDateOptions"
+							popover="Select a start date and time from which to start vizualizing receiption spots.
+							<p>For callsign [{{callsign}}] there is data available between {{dateFirstSpot}}
+							and {{toDate}}."  
+							popover-placement="right" popover-trigger="focus"/>
 						<timepicker ng-model="fromTime" minute-step="minuteStep"></timepicker>
 					</div>
 				</div>
@@ -28,7 +34,9 @@
 					</div>
 					<div class="col-md-8">
 						<input id="toDate" class="form-control" ng-model="toDate"
-							ui-date-format="yy'-'mm'-'dd" ui-date="toDateOptions" />
+							ui-date-format="yy'-'mm'-'dd" ui-date="toDateOptions"
+							popover="End date/time for received spots"  
+							popover-placement="right" popover-trigger="focus"/>
 						<timepicker ng-model="toTime" minute-step="minuteStep"></timepicker>
 					</div>
 				</div>
@@ -53,29 +61,34 @@
 					<alert ng-show="errorMsg">{{errorMsg}}</alert>
 				</div>
 			</div>
-			<div class="row" ng-show="numberOfSpots > 0">
-				<div class="col-md-offset-2 col-md-3">
-					<p>Spots by callsign [{{callsign}}] in database:
-						{{numberOfSpots}}</p>
+			<div class="row" >
+				<div class="col-md-12">
+					<div class="panel panel-default fadeInHideShow" ng-show="numberOfSpots > 1">
+						<div class="panel-heading">
+							<h3 class="panel-title">
+								Available data for callsign: {{callsign}}</h3>
+						</div>
+						<div class="panel-body">
+						
+						<p>Spots by callsign [{{callsign}}] in database: {{numberOfSpots}}</p>
+						<p>Earliest recorded spot: {{dateFirstSpot}}</p>
+						<p>Most recent recorded spot: {{dateLastSpot}}</p>
+						</div>
+					</div>
+					
 				</div>
-				<div class="col-md-3">
-					<p>Earliest recorded spot: {{dateFirstSpot}}</p>
-				</div>
-				<div class="col-md-3">
-					<p>Most recent recorded spot: {{dateLastSpot}}</p>
-				</div>
-
 			</div>
+		</div>
 
-<!-- TODO: move date controller code up into main controller -->
-			<div class="row" ng-if="showMapControls">
-				<div ng-include src="'mapviz/historyPlaybackControls.html'"></div>
-				<map center="37.7699298, -122.4469157" zoom="10">
-					<marker ng-repeat="pos in positions" position="{{pos.lat}}, {{pos.lng}}"></marker>
-      			</map>
-
-			</div>
+		<div class="row" ng-if="showMapControls">
+			<div ng-include src="'mapviz/historyPlaybackControls.html'"></div>
+			<map center="37.7699298, -122.4469157" zoom="10">
+				<marker ng-repeat="pos in positions"
+					position="{{pos.lat}}, {{pos.lng}}"></marker>
+			</map>
 
 		</div>
+
 	</div>
+</div>
 </div>

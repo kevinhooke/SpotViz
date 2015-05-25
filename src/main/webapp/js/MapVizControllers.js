@@ -1,4 +1,4 @@
-var spotVizControllers = angular.module('SpotVizControllers', []);
+var spotVizControllers = angular.module('SpotVizControllers', ["ngAnimate"]);
 
 spotVizControllers.filter('spotIntervalFilter', function(){
 	
@@ -49,12 +49,12 @@ spotVizControllers.controller('SpotVizController', ['$scope', '$http', '$filter'
     $scope.debugMsg = null;
     $scope.iterations = 0; //number of times the interval runs, 0 = continuous
     $scope.date = moment();
-    $scope.updateRate = 1; //number of seconds betweeb updates
-    $scope.timeInterval = 30; //how many minutes the date advances on each iteration
+    $scope.updateRate = 4; //number of seconds betweeb updates
+    
+    $scope.playbackControls = { timeInterval : 15 }; //how many minutes the date advances on each iteration
     $scope.state = "Stopped";
 
     //progress bar
-    $scope.maxValue=10;
     $scope.currentValue=1;
     $scope.currentInterval=0;
     
@@ -170,14 +170,13 @@ spotVizControllers.controller('SpotVizController', ['$scope', '$http', '$filter'
             var totalMinutesInSelectedTimeRange = diff.asMinutes();
             $scope.debugMsg = "Minutes: " + totalMinutesInSelectedTimeRange;
             
-            // totalMinutesInSelectedTimeRange / $scope.timeInterval
             var numberOfIntervalsInSelectedRange = 
-            	Math.ceil(totalMinutesInSelectedTimeRange / $scope.timeInterval);
+            	Math.ceil(totalMinutesInSelectedTimeRange / $scope.playbackControls.timeInterval);
             $scope.debugMsg = $scope.debugMsg + " / intervals: " + numberOfIntervalsInSelectedRange;
             
             if(numberOfIntervalsInSelectedRange == 0){
             	scope.errorMsg = "Selected date range was not long enough to contain any intervals of "
-            		+ " length " + $scope.timeInterval + " minutes. Please pick a longer time period.";
+            		+ " length " + $scope.playbackControls.timeInterval + " minutes. Please pick a longer time period.";
             }
             else{            	
 	            //calc array of interval start and end times between selected start and end
@@ -188,10 +187,11 @@ spotVizControllers.controller('SpotVizController', ['$scope', '$http', '$filter'
 	            while(tempIntervalCount < numberOfIntervalsInSelectedRange){
 	            	//first time through tempIntervalCount=0 so no minutes are added to the start date
 	            	//time operations modify the original value
-	            	currentIntervalStartDate = moment.utc(currentIntervalStartDate).add((tempIntervalCount * $scope.timeInterval), 'minutes');
+	            	currentIntervalStartDate = moment.utc(currentIntervalStartDate)
+	            		.add((tempIntervalCount * $scope.playbackControls.timeInterval), 'minutes');
 	            	//TODO: need to check time ranges are inclusive and we don't loose anything in a gap
 	            	currentIntervalEndDate = moment.utc(currentIntervalStartDate);
-	            	currentIntervalEndDate.add($scope.timeInterval, 'minutes');
+	            	currentIntervalEndDate.add($scope.playbackControls.timeInterval, 'minutes');
 	            	
 	            	intervalBoundaries[tempIntervalCount] = {
 	            			intervalStartDate : currentIntervalStartDate,
@@ -202,7 +202,7 @@ spotVizControllers.controller('SpotVizController', ['$scope', '$http', '$filter'
 	            }
 	            
 	            runningCounter = $interval(function () {
-	                $scope.date = moment($scope.date).add($scope.timeInterval, 'minutes');
+	                $scope.date = moment($scope.date).add($scope.playbackControls.timeInterval, 'minutes');
 	                $scope.currentInterval = $scope.currentInterval + 1;
 	                                
 	                //add subset of spots to markers for display
@@ -231,11 +231,25 @@ spotVizControllers.controller('SpotVizController', ['$scope', '$http', '$filter'
 
     }
 
+	//Resets current running playback ready for playback from start
+    $scope.reset = function () {
+    	$scope.cancel();
+    	$scope.currentValue=1;
+        $scope.currentInterval=0;	
+    }
+
+    
+    //Changes the length of time in each interval
+    $scope.chnageIntervalLength = function(){
+    	//TODO
+    }
+    
+    
     //Changes the playback rate for the current running playback
     $scope.changeRate = function () {
         $scope.cancel();
         runningCounter = $interval(function () {
-            $scope.date = moment($scope.date).add($scope.timeInterval, 'minutes');
+            $scope.date = moment($scope.date).add($scope.playbackControls.timeInterval, 'minutes');
         }, 1000 * $scope.updateRate, $scope.iterations);
     };
 

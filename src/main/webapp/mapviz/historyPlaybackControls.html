@@ -10,8 +10,11 @@
 	<div class="row">
 		<div class="col-sm-12">
 			<p>
-				Interval rate: <select ng-model="timeInterval"
-					ng-change="changeRate()">
+				Interval rate: <select ng-model="playbackControls.timeInterval"
+					ng-change="chnageIntervalLength()">
+					<option value="5">5 mins</option>
+					<option value="10">10 mins</option>
+					<option value="15">15 mins</option>
 					<option value="30">30 mins</option>
 					<option value="60">1 hour</option>
 					<option value="120">2 hours</option>
@@ -32,6 +35,11 @@
 				<button class="btn btn-primary" data-ng-click="stop()">
 					<span class="glyphicon glyphicon-pause" aria-hidden="true"></span>Pause
 				</button>
+				
+				<button class="btn btn-primary" data-ng-click="reset()">
+					<span class="glyphicon glyphicon-pause" aria-hidden="true"></span>Reset
+				</button>
+				
 				State: {{state}} / current playback interval: {{currentInterval}} / 
 				Debug: {{debugMsg}} 
 			<p>
