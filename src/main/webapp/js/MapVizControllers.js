@@ -29,8 +29,17 @@ spotVizControllers.filter('spotIntervalFilter', function(){
 spotVizControllers.controller('SpotVizController', ['$scope', '$http', '$filter', '$interval',
 		function($scope, $http, $filter, $interval) {
 
+	//set focus on callsign field
+	angular.element('#callsign').trigger('focus');
+	
+	//show the welcome instructions
+	$scope.visualizeWelcome = true;
+	
 	//toggle for showing map after form values submitted
 	$scope.showMap = false;
+	
+	//spot data available count
+	$scope.numberOfSpots = 0;
 	
 	//selected start and end dates and times, combined
 	$scope.selectedStartDateTime = null;
@@ -82,42 +91,57 @@ spotVizControllers.controller('SpotVizController', ['$scope', '$http', '$filter'
 	 * Retrieves a summary of spots for the currently entered callsign. 
 	 */
 	$scope.retrieveSpotSummaryForCallsign = function() {
-		url = "/spotviz/spotdata/spots/" + $scope.callsign;
-		$http.get(url).success(function(data) {
-			console.log('data: ' + data )
-			if (Object.keys(data) == 0 ) {
-				$scope.msg = "Sorry, there's no spot data currently uploaded for callsign [" 
-					+ $scope.callsign + "]. Click the link 'How to upload your spots' (TODO) for" +
-							"instructions on how to upload your received spot data for visualzation.";
-				
-				$scope.numberOfSpots = 0;
-				$scope.spots = "";
-				$scope.markers = [];
-			} else {
-				//TODO: setting default from and to dates are not in expected format, but selecting from
-				//picker is in correct format
-				$scope.msg = '';
-				$scope.numberOfSpots = data.totalSpots;
-				$scope.dateFirstSpot = data.firstSpot.$date;
-				//$scope.fromDate = moment($scope.dateFirstSpot).format("mm/DD/YYYY").toDate();
-				$scope.fromDate = $scope.dateFirstSpot;
-
-				//lastSpotDate = moment(data.lastSpot.$date).add(1, 'days').format("mm/DD/YYYY").toDate();
-				lastSpotDate = moment(data.lastSpot.$date).add(1, 'days').toDate();
-				$scope.toDate = lastSpotDate;
-				$scope.fromDateOptions = {
-					minDate: new Date(data.firstSpot.$date),
-					maxDate: lastSpotDate
-				};
-				$scope.dateLastSpot = data.lastSpot.$date;
-				
-				$scope.toDateOptions = {
+		if(!angular.isUndefined($scope.callsign) && $scope.callsign != null){
+			url = "/spotviz/spotdata/spots/" + $scope.callsign;
+			$http.get(url).success(function(data) {
+				console.log('data: ' + data )
+				if (Object.keys(data) == 0 ) {
+					$scope.msg = "Sorry, there's no spot data currently uploaded for callsign [" 
+						+ $scope.callsign + "]. Click the link 'How to upload your spots' (TODO) for" +
+								"instructions on how to upload your received spot data for visualzation.";
+					
+					$scope.popoverTextWhenDataAvailable = "";
+					$scope.numberOfSpots = 0;
+					$scope.spots = "";
+					$scope.markers = [];
+				} else {
+					//TODO: setting default from and to dates are not in expected format, but selecting from
+					//picker is in correct format
+					$scope.msg = '';
+					$scope.numberOfSpots = data.totalSpots;
+					$scope.dateFirstSpot = data.firstSpot.$date;
+					//$scope.fromDate = moment($scope.dateFirstSpot).format("mm/DD/YYYY").toDate();
+					$scope.fromDate = $scope.dateFirstSpot;
+	
+					//lastSpotDate = moment(data.lastSpot.$date).add(1, 'days').format("mm/DD/YYYY").toDate();
+					lastSpotDate = moment(data.lastSpot.$date).add(1, 'days').toDate();
+					$scope.toDate = lastSpotDate;
+					$scope.fromDateOptions = {
 						minDate: new Date(data.firstSpot.$date),
 						maxDate: lastSpotDate
 					};
-			}
-			
-		});
+					$scope.dateLastSpot = data.lastSpot.$date;
+					
+					$scope.toDateOptions = {
+							minDate: new Date(data.firstSpot.$date),
+							maxDate: lastSpotDate
+						};
+					
+					$scope.formattedFromDate = moment.utc($scope.dateFirstSpot).format("YYYY/MM/DD HH:mm:ss");
+					$scope.formattedEndDate = moment.utc($scope.toDate).format("YYYY/MM/DD HH:mm:ss");
+					
+					$scope.popoverTextWhenDataAvailable = "For callsign [" + $scope.callsign 
+						+ "] there is data available from " 
+						+ $scope.formattedFromDate + " UTC "
+						+ "and " 
+						+ $scope.formattedEndDate + " UTC.";
+				}
+				
+			});
+		}
+		else{
+			$scope.popoverTextWhenDataAvailable = "";
+		}
 	}
 	
 	/*
@@ -144,7 +168,10 @@ spotVizControllers.controller('SpotVizController', ['$scope', '$http', '$filter'
 				$scope.spots = "";
 				$scope.markers = [];
 			} else {
-				$scope.msg = data.length + " spots for callsign: " + $scope.callsign;
+				$scope.msg = "";
+				$scope.selectedRangeMsg = "Selected start date : " + formattedFromDate + fromTimeOnly + " UTC "
+					+ "end date: " + formattedToDate + " " + toTimeOnly + " UTC "
+					+ "Spots for selected date range: " + data.length;
 				$scope.spots = data;
 				$scope.showMapControls = true;
 			}
