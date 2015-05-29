@@ -12,9 +12,11 @@
 			<div id="outer" class="panel panel-default">
 				<div id="questions" class="panel-body">
 					<ol>
-						<li>What does this site do?</li>
-						<li>placeholder2</li>
-						<li>placeholder3</li>
+						<li><a href="#/faq#q1">What does this site do?</a></li>
+						<li><a href="#/faq#q2">How accurate is this for predicting propagation conditions?</a></li>
+						<li><a href="#/faq#q3">Where does the data come from?</a></li>
+						<li><a href="#/faq#q4">Isn't this similar to what PSKReporter already does?</a></li>
+						<li><a href="#/faq#q5">Can I develop my own client to post/upload data?</a></li>
 					</ol>
 				</div>
 			</div>
@@ -25,6 +27,7 @@
 		<div class="col-med-12">
 			<div id="q1" class="panel panel-default">
 				<div id="q1-body" class="panel-body">
+					<a name="q1"/>
 					<h4>What does this site do?</h4>
 					<p>This site provides an animated visualization of the station location of JT65 / JT9 signals 
 					transmitted and received by Amateur Radio operators over time. I built this site to
@@ -38,8 +41,9 @@
 
 	<div class="row">
 		<div class="col-med-12">
-			<div id="q1" class="panel panel-default">
-				<div id="q1-body" class="panel-body">
+			<div id="q2" class="panel panel-default">
+				<div id="q2-body" class="panel-body">
+					<a name="q2"/>
 					<h4>How accurate is this for predicting propagation conditions?</h4>
 					<p>The display of received stations can only display stations based on data you
 					or other operators upload, and the stations received during the time
@@ -47,13 +51,13 @@
 					<p>For best results therefore, data received over a longer period of time (multiple
 					hours) is going to be more interesting to visualize that data received over
 					a relatively short period of time like 15 minutes. </p>
-					<p>This visualization is also completely dependent on remote stations transmitting
+					<p>This visualization is completely dependent on remote stations transmitting
 					over a period of time. For example, if you receive station A transmitting
-					over a 10 minute period but then their tranmissions stop, this doesn't necessarily
+					over a 10 minute period but then their transmissions stop, this doesn't necessarily
 					mean that the propagation path to that station has closed, because they may
-					have just turned off their radio. Even still, receiving stations in a general location
+					have just turned off their radio. Even still, receiving stations from a general location
 					is a positive indication that a path is (or was) open to that location, and so
-					is still interesting to see visually on a map over time how this may change.</p>
+					is still interesting to see on a map over time how this may change.</p>
 				</div>
 			</div>
 		</div>
@@ -62,8 +66,9 @@
 
 	<div class="row">
 		<div class="col-med-12">
-			<div id="q2" class="panel panel-default">
-				<div id="q2-body" class="panel-body">
+			<div id="q3" class="panel panel-default">
+				<div id="q3-body" class="panel-body">
+					<a name="q3"/>
 					<h4>Where does the data come from?</h4>
 					<p>You can upload your own log data for
 					visualization, or you can browse the data uploaded by other operators. For instructions
@@ -75,13 +80,32 @@
 
 	<div class="row">
 		<div class="col-med-12">
-			<div id="q3" class="panel panel-default">
-				<div id="q3-body" class="panel-body">
-					<h4>Placeholder3?</h4>
-					<p>todo</p>
+			<div id="q4" class="panel panel-default">
+				<div id="q4-body" class="panel-body">
+					<h4>Isn't this similar to what PSKReporter already does?</h4>
+					<p>PSKReporter is an excellent site and provides great visibility into signals transmitted
+					or received by a callsign or gridsquare. This site differs by allowing you to 
+					see the received signals <i>replayed back over a period of time</i>. It allows
+					you to ask questions like: </p>
+					<ul>
+					<li>"What signals did I receive between 9am and 6pm today, and
+					where were those stations located?"</li>
+					<li>"Where were the majority of stations that I received this morning located, and 
+					how did the propagation conditions change between this morning and this evening?"</li>
+					</ul>
 				</div>
 			</div>
 		</div>
 	</div>
 
+	<div class="row">
+		<div class="col-med-12">
+			<div id="q5" class="panel panel-default">
+				<div id="q5-body" class="panel-body">
+					<h4>TODO</h4>
+
+				</div>
+			</div>
+		</div>
+	</div>
 </div>

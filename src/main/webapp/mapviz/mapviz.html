@@ -119,12 +119,13 @@
 		<div ng-include src="'mapviz/historyPlaybackControls.html'"></div>
 	</div>
 	<div class="row" ng-if="showMapControls" style="height:450px;">
-		<td class="col-md-offset-1 col-md-10" style="height:450px;">
+	
+		<div class="col-md-offset-1 col-md-10" style="height:450px;">
 			<map style="height:100%" center="37.7699298, -122.4469157" zoom="10">
 				<marker ng-repeat="pos in positions"
 					position="{{pos.lat}}, {{pos.lng}}"></marker>
 			</map>
-		</td>	
+		</div>	
 		
 	</div>
 </div>
