@@ -3,6 +3,7 @@
 <head>
 	<meta charset="UTF-8">
 	<link href="css/bootstrap-3.3.4-dist/css/bootstrap.css" rel="stylesheet"/>
+        <link href="css/bootstrap-nav-wizard/bootstrap-nav-wizard.css" rel="stylesheet"/>
 	<link rel="stylesheet" href="css/callsignviz.css"/>
 
 	<!-- jQuery -->
@@ -12,11 +13,16 @@
 
 	<!-- Angular -->
 	<script type="text/javascript" src="bower_components/angular/angular.js"></script>
-	<script type="text/javascript" src="bower_components/angular-route/angular-route.js"></script>
+	<!-- <script type="text/javascript" src="bower_components/angular-route/angular-route.js"></script> -->
 	<script type="text/javascript" src="bower_components/angular-animate/angular-animate.js"></script>
 
 	<!-- AngularJS ui-date -->
 	<script type="text/javascript" src="bower_components/angular-ui-date/src/date.js"></script>
+        
+        <!-- AngularJS ui-router -->
+	<script type="text/javascript" src="bower_components/angular-ui-router/release/angular-ui-router.js"></script>
+        
+        
 
 	<!-- AngularJS google maps
 	<script src="bower_components/lodash/dist/lodash.min.js"></script>
@@ -46,22 +52,34 @@
 		  <h1>SpotViz</h1>
 		  <p>Historical visualization of received JT65/JT9 signals received by Amateur Radio operators 
 		  around the world.</p>
-			<p>By Kevin Hooke KK6DCT</p>
+			<p>By Kevin Hooke KK6DCT / 
+                        <a href="https://twitter.com/share" class="twitter-share-button" data-url="http://www.spotviz.info" data-text="Historical visualization of amateur radio signals" data-via="kevinhooke">Tweet</a>
+<script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');</script>
+                        </p>
 		</div>
 	
 		<nav class="navbar navbar-default">
 			<ul class="nav navbar-nav">
+<!-- 
 				<li><a href="index.html#/">Home</a></li>
 				<li><a href="index.html#/mapviz">Visualize!</a></li>
 				<li><a href="index.html#/upload">How to upload your spots</a></li>
 				<li><a href="index.html#/faq">FAQ</a></li>
 				<li><a href="index.html#/bug">Report a bug/enhancement request</a></li>
 				<li><a href="index.html#/about">About</a></li>
+ -->
+				<li><a ui-sref="home">Home</a></li>
+				<li><a ui-sref="visualize.selectCallsign">Visualize!</a></li>
+				<li><a ui-sref="upload">How to upload your spots</a></li>
+				<li><a ui-sref="faq">FAQ</a></li>
+				<li><a ui-sref="bug">Report a bug/enhancement request</a></li>
+				<li><a ui-sref="about">About</a></li>
 
 			</ul>
 		</nav>
 	
-		<div ng-view></div>
+		<!-- <div ng-view></div>  -->
+		<div ui-view></div>
 		
 		<div class="row">
 		<div class="col-md-12">

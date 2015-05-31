@@ -1,0 +1,76 @@
+<div class="row">
+
+    <div class="col-md-6">
+
+        <div class="row" ng-show="search.visualizeWelcome">
+            <div class="col-md-12">
+
+                <h3>Getting Started</h3>
+                <p>To visualize your historical data:</p>
+                <ol>
+                    <li>Enter a callsign using the form to the right</li>
+                    <li>If data is available for the entered callsign, select a
+                        date range between which to animate the received callsigns on the
+                        map.
+                </ol>
+
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-12">
+                <alert ng-show="search.msg">{{search.msg}}</alert>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-12">
+                <alert ng-show="search.errorMsg">{{search.errorMsg}}</alert>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-12">
+                <div class="panel panel-default fadeInHideShow"
+                     ng-show="search.numberOfSpots > 0">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">Available data for callsign:
+                            {{search.callsign}}</h3>
+                    </div>
+                    <div class="panel-body">
+
+                        <p>Spots by callsign [{{search.callsign}}] in database:
+                            {{search.numberOfSpots}}</p>
+                        <p>Earliest recorded spot: {{search.formattedFromDate}} UTC</p>
+                        <p>Most recent recorded spot: {{search.formattedEndDate}} UTC</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-12">
+                <alert ng-show="search.selectedRangeMsg">{{search.selectedRangeMsg}}</alert>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="col-md-6 form-group">
+        <form>
+            <div class="row" style="padding-top: 90px;">
+                <div class="col-md-3">
+                    <label for="callsign">Callsign</label>
+                </div>
+                <div class="col-md-7">
+                    <input id="callsign" class="form-control" type="text"
+                           ng-model="search.callsign"
+                           popover="Enter a callsign to visualize their uploaded reception data (yours or someone else's)"
+                           popover-trigger="focus" />
+                </div>
+                <div class="col-md-2">
+                    <button class="btn btn-primary" ng-click="retrieveSpotSummaryForCallsign()">Go!</button>
+                </div>
+            </div>
+    </div>
+</div>

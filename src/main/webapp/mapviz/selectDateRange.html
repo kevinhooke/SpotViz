@@ -1,0 +1,35 @@
+<div class="fadeInHideShow" ng-show="numberOfSpots > 0">
+    <div class="row">
+        <div class="col-md-3">
+            <label for="fromDate">Staring from date/time:</label>
+        </div>
+        <div class="col-md-8">
+            <input id="fromDate" class="form-control" ng-model="fromDate"
+                   ui-date-format="yy'-'mm'-'dd" ui-date="fromDateOptions"
+                   popover="Select a start date and time from which to start visualizing your reception data.
+                   {{popoverTextWhenDataAvailable}}"
+                   popover-trigger="focus" />
+            <timepicker ng-model="fromTime" minute-step="minuteStep"></timepicker>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-3">
+            <label for="toDate">Ending at date:</label>
+        </div>
+        <div class="col-md-8">
+            <input id="toDate" class="form-control" ng-model="toDate"
+                   ui-date-format="yy'-'mm'-'dd" ui-date="toDateOptions"
+                   popover="End date/time for received spots"
+                   popover-placement="left" popover-trigger="focus" />
+            <timepicker ng-model="toTime" minute-step="minuteStep"></timepicker>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-3">
+            <button class="btn btn-default btn-primary" ng-click="retrieve()">Retrieve
+                data</button>
+        </div>
+    </div>
+</div>

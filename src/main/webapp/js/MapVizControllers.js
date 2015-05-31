@@ -31,41 +31,43 @@ spotVizControllers.controller('SpotVizController', ['$scope', '$http', '$filter'
 
 	//set focus on callsign field
 	angular.element('#callsign').trigger('focus');
-	
+	//model for search views
+        $scope.search = {};
+        
 	//show the welcome instructions
-	$scope.visualizeWelcome = true;
+	$scope.search.visualizeWelcome = true;
 	
 	//toggle for showing map after form values submitted
-	$scope.showMap = false;
+	$scope.search.showMap = false;
 	
 	//spot data available count
-	$scope.numberOfSpots = 0;
+	$scope.search.numberOfSpots = 0;
 	
 	//selected start and end dates and times, combined
-	$scope.selectedStartDateTime = null;
-	$scope.selectedEndDateTime = null;
+	$scope.search.selectedStartDateTime = null;
+	$scope.search.selectedEndDateTime = null;
 	
-    $scope.minuteStep = 15;
+    $scope.search.minuteStep = 15;
     
     //default from and to date options for date pickers
-    $scope.fromDateOptions = null;
-    $scope.toDateOptions = null;
+    $scope.search.fromDateOptions = null;
+    $scope.search.toDateOptions = null;
     
     //initial empty array for map marker positions
-    $scope.positions = [];
+    $scope.search.positions = [];
 
     var runningCounter = null;
-    $scope.debugMsg = null;
-    $scope.iterations = 0; //number of times the interval runs, 0 = continuous
-    $scope.date = moment();
-    $scope.updateRate = 4; //number of seconds betweeb updates
+    $scope.search.debugMsg = null;
+    $scope.search.iterations = 0; //number of times the interval runs, 0 = continuous
+    $scope.search.date = moment();
+    $scope.search.updateRate = 4; //number of seconds betweeb updates
     
     $scope.playbackControls = { timeInterval : 15 }; //how many minutes the date advances on each iteration
-    $scope.state = "Stopped";
+    $scope.search.state = "Stopped";
 
     //progress bar
-    $scope.currentValue=1;
-    $scope.currentInterval=0;
+    $scope.search.currentValue=1;
+    $scope.search.currentInterval=0;
     
     
     /*
@@ -75,12 +77,12 @@ spotVizControllers.controller('SpotVizController', ['$scope', '$http', '$filter'
     	
     	var currentIntervalSpots = $filter('spotIntervalFilter')(data, interval, intervalBoundaries);
     	//empty the array of positions
-    	$scope.positions = [];
+    	$scope.search.positions = [];
     	
     	markerId = 0;
 		for (var i=0; i< currentIntervalSpots.length; i++) {
 
-			$scope.positions.push({
+			$scope.search.positions.push({
 				lat : currentIntervalSpots[i].spotDetail.latitude,
 				lng : currentIntervalSpots[i].spotDetail.longitude});
 		}
@@ -91,8 +93,8 @@ spotVizControllers.controller('SpotVizController', ['$scope', '$http', '$filter'
 	 * Retrieves a summary of spots for the currently entered callsign. 
 	 */
 	$scope.retrieveSpotSummaryForCallsign = function() {
-		if(!angular.isUndefined($scope.callsign) && $scope.callsign != null){
-			url = "/spotviz/spotdata/spots/" + $scope.callsign;
+		if(!angular.isUndefined($scope.search.callsign) && $scope.search.callsign != null){
+			url = "/spotviz/spotdata/spots/" + $scope.search.callsign;
 			$http.get(url).success(function(data) {
 				console.log('data: ' + data )
 				if (Object.keys(data) == 0 ) {
@@ -100,47 +102,46 @@ spotVizControllers.controller('SpotVizController', ['$scope', '$http', '$filter'
 						+ $scope.callsign + "]. Click the link 'How to upload your spots' (TODO) for" +
 								"instructions on how to upload your received spot data for visualzation.";
 					
-					$scope.popoverTextWhenDataAvailable = "";
-					$scope.numberOfSpots = 0;
-					$scope.spots = "";
-					$scope.markers = [];
+					$scope.search.popoverTextWhenDataAvailable = "";
+					$scope.search.numberOfSpots = 0;
+					$scope.search.spots = "";
+					$scope.search.markers = [];
 				} else {
 					//TODO: setting default from and to dates are not in expected format, but selecting from
 					//picker is in correct format
-					$scope.msg = '';
-					$scope.numberOfSpots = data.totalSpots;
-					$scope.dateFirstSpot = data.firstSpot.$date;
+					$scope.search.msg = '';
+					$scope.search.numberOfSpots = data.totalSpots;
+					$scope.search.dateFirstSpot = data.firstSpot.$date;
 					//$scope.fromDate = moment($scope.dateFirstSpot).format("mm/DD/YYYY").toDate();
-					$scope.fromDate = $scope.dateFirstSpot;
+					$scope.search.fromDate = $scope.search.dateFirstSpot;
 	
-					//lastSpotDate = moment(data.lastSpot.$date).add(1, 'days').format("mm/DD/YYYY").toDate();
 					lastSpotDate = moment(data.lastSpot.$date).add(1, 'days').toDate();
-					$scope.toDate = lastSpotDate;
-					$scope.fromDateOptions = {
+					$scope.search.toDate = lastSpotDate;
+					$scope.search.fromDateOptions = {
 						minDate: new Date(data.firstSpot.$date),
 						maxDate: lastSpotDate
 					};
-					$scope.dateLastSpot = data.lastSpot.$date;
+					$scope.search.dateLastSpot = data.lastSpot.$date;
 					
-					$scope.toDateOptions = {
+					$scope.search.toDateOptions = {
 							minDate: new Date(data.firstSpot.$date),
 							maxDate: lastSpotDate
 						};
 					
-					$scope.formattedFromDate = moment.utc($scope.dateFirstSpot).format("YYYY/MM/DD HH:mm:ss");
-					$scope.formattedEndDate = moment.utc($scope.toDate).format("YYYY/MM/DD HH:mm:ss");
+					$scope.search.formattedFromDate = moment.utc($scope.dateFirstSpot).format("YYYY/MM/DD HH:mm:ss");
+					$scope.search.formattedEndDate = moment.utc($scope.toDate).format("YYYY/MM/DD HH:mm:ss");
 					
-					$scope.popoverTextWhenDataAvailable = "For callsign [" + $scope.callsign 
+					$scope.search.popoverTextWhenDataAvailable = "For callsign [" + $scope.callsign 
 						+ "] there is data available from " 
-						+ $scope.formattedFromDate + " UTC "
+						+ $scope.search.formattedFromDate + " UTC "
 						+ "and " 
-						+ $scope.formattedEndDate + " UTC.";
+						+ $scope.search.formattedEndDate + " UTC.";
 				}
 				
 			});
 		}
 		else{
-			$scope.popoverTextWhenDataAvailable = "";
+			$scope.search.popoverTextWhenDataAvailable = "";
 		}
 	}
 	
@@ -152,28 +153,28 @@ spotVizControllers.controller('SpotVizController', ['$scope', '$http', '$filter'
 		var toTimeOnly = moment($scope.toTime).format("HH:mm:ss");
 		var formattedFromDate = moment($scope.fromDate).format("YYYY-MM-DD");
 		var formattedToDate = moment($scope.toDate).format("YYYY-MM-DD");
-		$scope.selectedStartDateTime = formattedFromDate + "T" + fromTimeOnly + "Z";
-		$scope.selectedEndDateTime = formattedToDate + "T" + toTimeOnly + "Z";
+		$scope.search.selectedStartDateTime = formattedFromDate + "T" + fromTimeOnly + "Z";
+		$scope.search.selectedEndDateTime = formattedToDate + "T" + toTimeOnly + "Z";
 		
 		
-		url = "/spotviz/spotdata/spots/" + $scope.callsign 
-			+ "?fromdate=" + $scope.selectedStartDateTime 
-			+ "&todate=" + $scope.selectedEndDateTime;
+		url = "/spotviz/spotdata/spots/" + $scope.search.callsign 
+			+ "?fromdate=" + $scope.search.selectedStartDateTime 
+			+ "&todate=" + $scope.search.selectedEndDateTime;
 		
 		
-		$scope.debugMsg = "url is:" + url;
+		$scope.search.debugMsg = "url is:" + url;
 		$http.get(url).success(function(data) {
 			if (data == {}) {
-				$scope.msg = "No data for callsign: " + $scope.callsign;
-				$scope.spots = "";
-				$scope.markers = [];
+				$scope.search.msg = "No data for callsign: " + $scope.callsign;
+				$scope.search.spots = "";
+				$scope.search.markers = [];
 			} else {
-				$scope.msg = "";
-				$scope.selectedRangeMsg = "Selected start date : " + formattedFromDate + fromTimeOnly + " UTC "
+				$scope.search.msg = "";
+				$scope.search.selectedRangeMsg = "Selected start date : " + formattedFromDate + fromTimeOnly + " UTC "
 					+ "end date: " + formattedToDate + " " + toTimeOnly + " UTC "
 					+ "Spots for selected date range: " + data.length;
-				$scope.spots = data;
-				$scope.showMapControls = true;
+				$scope.search.spots = data;
+				$scope.search.showMapControls = true;
 			}
 		}).error(function(data) {
 			$scope.msg = "Failed to retrieve data at this time. Try later?";
@@ -187,7 +188,7 @@ spotVizControllers.controller('SpotVizController', ['$scope', '$http', '$filter'
             return;
         }
         else {
-            $scope.state = "Running";
+            $scope.search.state = "Running";
             var intervalBoundaries = [];
             
             //calc difference in minutes: selectedEndDateTime - selectedStartDateTime
@@ -195,14 +196,14 @@ spotVizControllers.controller('SpotVizController', ['$scope', '$http', '$filter'
             var endMoment = moment.utc($scope.selectedEndDateTime);
             var diff = moment.duration(endMoment.diff(startMoment));
             var totalMinutesInSelectedTimeRange = diff.asMinutes();
-            $scope.debugMsg = "Minutes: " + totalMinutesInSelectedTimeRange;
+            $scope.search.debugMsg = "Minutes: " + totalMinutesInSelectedTimeRange;
             
             var numberOfIntervalsInSelectedRange = 
             	Math.ceil(totalMinutesInSelectedTimeRange / $scope.playbackControls.timeInterval);
-            $scope.debugMsg = $scope.debugMsg + " / intervals: " + numberOfIntervalsInSelectedRange;
+            $scope.search.debugMsg = $scope.search.debugMsg + " / intervals: " + numberOfIntervalsInSelectedRange;
             
             if(numberOfIntervalsInSelectedRange == 0){
-            	scope.errorMsg = "Selected date range was not long enough to contain any intervals of "
+            	$scope.search.errorMsg = "Selected date range was not long enough to contain any intervals of "
             		+ " length " + $scope.playbackControls.timeInterval + " minutes. Please pick a longer time period.";
             }
             else{            	
@@ -244,7 +245,7 @@ spotVizControllers.controller('SpotVizController', ['$scope', '$http', '$filter'
 	//Stops the current running playback
 	$scope.stop = function () {
         if ($interval.cancel(runningCounter) ){
-            $scope.state = "Stopped";
+            $scope.search.state = "Stopped";
             runningCounter = null;
         }
 
