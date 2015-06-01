@@ -5,9 +5,8 @@
         <p>To visualize your historical data:</p>
         <ol>
             <li>Enter a callsign using the form to the right</li>
-            <li>If data is available for the entered callsign, select a
-                date range between which to animate the received callsigns on the
-                map.
+            <li>If data is available for the entered callsign, press the Continue button to 
+			go to the next step (to select a date range for playback)
         </ol>
     </div>
 
@@ -19,7 +18,7 @@
                 </div>
                 <div class="col-md-7">
                     <input id="callsign" class="form-control" type="text"
-                           ng-model="search.callsign"
+                           ng-model="search.callsign" ng-change="hideDialogsIfCallsignEmpty()"
                            popover="Enter a callsign to visualize their uploaded reception data (yours or someone else's)"
                            popover-trigger="focus" />
                 </div>
@@ -36,7 +35,7 @@
 <div class="row">
     <div class="col-md-12">
         <div class="panel panel-default fadeInHideShow"
-             ng-show="search.numberOfSpots > 0">
+             ng-show="search.numberOfSpots > 0"">
             <div class="row">
                 <div class="col-md-6">
                     <div class="panel-heading">

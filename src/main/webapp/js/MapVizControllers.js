@@ -146,6 +146,12 @@ spotVizControllers.controller('SpotVizController', ['$scope', '$http', '$filter'
             }
         }
 
+        $scope.hideDialogsIfCallsignEmpty = function(){
+            if($scope.search.callsign === ''){
+                $scope.search.numberOfSpots = null;
+            }
+        }
+
         /*
          * Resets the page 1 callsign search.
          * @returns {undefined}
