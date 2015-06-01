@@ -1,59 +1,14 @@
 <div class="row">
 
     <div class="col-md-6">
-
-        <div class="row" ng-show="search.visualizeWelcome">
-            <div class="col-md-12">
-
-                <h3>Getting Started</h3>
-                <p>To visualize your historical data:</p>
-                <ol>
-                    <li>Enter a callsign using the form to the right</li>
-                    <li>If data is available for the entered callsign, select a
-                        date range between which to animate the received callsigns on the
-                        map.
-                </ol>
-
-            </div>
-        </div>
-
-        <div class="row">
-            <div class="col-md-12">
-                <alert ng-show="search.msg">{{search.msg}}</alert>
-            </div>
-        </div>
-
-        <div class="row">
-            <div class="col-md-12">
-                <alert ng-show="search.errorMsg">{{search.errorMsg}}</alert>
-            </div>
-        </div>
-
-        <div class="row">
-            <div class="col-md-12">
-                <div class="panel panel-default fadeInHideShow"
-                     ng-show="search.numberOfSpots > 0">
-                    <div class="panel-heading">
-                        <h3 class="panel-title">Available data for callsign:
-                            {{search.callsign}}</h3>
-                    </div>
-                    <div class="panel-body">
-
-                        <p>Spots by callsign [{{search.callsign}}] in database:
-                            {{search.numberOfSpots}}</p>
-                        <p>Earliest recorded spot: {{search.formattedFromDate}} UTC</p>
-                        <p>Most recent recorded spot: {{search.formattedEndDate}} UTC</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="row">
-            <div class="col-md-12">
-                <alert ng-show="search.selectedRangeMsg">{{search.selectedRangeMsg}}</alert>
-            </div>
-        </div>
-
+        <h3>Getting Started</h3>
+        <p>To visualize your historical data:</p>
+        <ol>
+            <li>Enter a callsign using the form to the right</li>
+            <li>If data is available for the entered callsign, select a
+                date range between which to animate the received callsigns on the
+                map.
+        </ol>
     </div>
 
     <div class="col-md-6 form-group">
@@ -72,5 +27,102 @@
                     <button class="btn btn-primary" ng-click="retrieveSpotSummaryForCallsign()">Go!</button>
                 </div>
             </div>
+        </form>
+    </div>
+
+</div>
+
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="panel panel-default fadeInHideShow"
+             ng-show="search.numberOfSpots > 0">
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">Available data for callsign:
+                            {{search.callsign}}</h3>
+                    </div>
+                    <div class="panel-body">
+
+                        <p>Spots by callsign [{{search.callsign}}] in database:
+                            {{search.numberOfSpots}}</p>
+                        <p>Earliest recorded spot: {{search.formattedFromDate}} UTC</p>
+                        <p>Most recent recorded spot: {{search.formattedEndDate}} UTC</p>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">Select Date Range for Visualization?</h3>
+                    </div>
+                    <div class="panel-body">
+                        <p><input class="btn btn default" type="button" 
+                                  ng-click="navigateToDateRangeSelection()" 
+                                  value="Continue to select date range?"/>
+                            or <a ng-click="resetCallsignSearch()">
+                                Reset and search again?</a></p>
+                    </div>
+
+                </div>
+            </div>
+        </div>
     </div>
 </div>
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="panel panel-default fadeInHideShow"
+             ng-show="search.numberOfSpots == 0">
+            <div class="panel-heading">
+                <h3 class="panel-title">No data for callsign:
+                    {{search.callsign}}</h3>
+            </div>
+            <div class="panel-body">
+                <p>We don't currently have any data uploaded for callsign [{{search.callsign}}].</p>
+
+                <p>You can either search for another callsign (TODO), browse available
+                    data (TODO), or upload your own log files for visualization.</p>
+
+                <p>See <a ui-sref="upload">here</a> for instructions on how to upload your own data files.</p>
+
+
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- first version, replaced 
+<div class="row">
+    <div class="col-md-12">
+        <div class="panel panel-default fadeInHideShow"
+             ng-show="search.numberOfSpots > 0">
+            <div class="panel-heading">
+                <h3 class="panel-title">Available data for callsign:
+                    {{search.callsign}}</h3>
+            </div>
+            <div class="panel-body">
+
+                <p>Spots by callsign [{{search.callsign}}] in database:
+                    {{search.numberOfSpots}}</p>
+                <p>Earliest recorded spot: {{search.formattedFromDate}} UTC</p>
+                <p>Most recent recorded spot: {{search.formattedEndDate}} UTC</p>
+            </div>
+        </div>
+    </div>
+</div>
+-->
+
+<!-- still needed, used?
+        <div class="row">
+            <div class="col-md-12">
+                <alert ng-show="search.msg">{{search.msg}}</alert>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-12">
+                <alert ng-show="search.errorMsg">{{search.errorMsg}}</alert>
+            </div>
+        </div>
+-->
