@@ -2,26 +2,24 @@
 
 	<div class="col-md-6">
 		<h3>Select Date Range for Visualization Playback</h3>
-		<p>Todo:</p>
-		<ol>
-			<li>step 1 todo</li>
-			<li>step 2 todo.
-		</ol>
+		<p>Next, select a start and end date/time between which you want to playback
+                the visualization of the available received data. The panel below shows the range
+                between which there is available data ready to visualize:</p>
 	</div>
 
-	<div class="col-md-6">
+	<div class="col-md-6" style="padding-top: 90px;">
 
 		<div class="row">
 			<div class="col-md-3">
 				<label for="fromDate">Staring from date/time:</label>
 			</div>
 			<div class="col-md-8">
-				<input id="fromDate" class="form-control" ng-model="fromDate"
-					ui-date-format="yy'-'mm'-'dd" ui-date="fromDateOptions"
+				<input id="fromDate" class="form-control" ng-model="search.fromDate"
+					ui-date-format="yy'-'mm'-'dd" ui-date="search.fromDateOptions"
 					popover="Select a start date and time from which to start visualizing your reception data.
-                   {{popoverTextWhenDataAvailable}}"
+                   {{search.popoverTextWhenDataAvailable}}"
 					popover-trigger="focus" />
-				<timepicker ng-model="fromTime" minute-step="minuteStep"></timepicker>
+				<timepicker ng-model="search.fromTime" minute-step="search.minuteStep"></timepicker>
 			</div>
 		</div>
 
@@ -30,11 +28,11 @@
 				<label for="toDate">Ending at date:</label>
 			</div>
 			<div class="col-md-8">
-				<input id="toDate" class="form-control" ng-model="toDate"
-					ui-date-format="yy'-'mm'-'dd" ui-date="toDateOptions"
+				<input id="toDate" class="form-control" ng-model="search.toDate"
+					ui-date-format="yy'-'mm'-'dd" ui-date="search.toDateOptions"
 					popover="End date/time for received spots" popover-placement="left"
 					popover-trigger="focus" />
-				<timepicker ng-model="toTime" minute-step="minuteStep"></timepicker>
+				<timepicker ng-model="search.toTime" minute-step="search.minuteStep"></timepicker>
 			</div>
 		</div>
 
