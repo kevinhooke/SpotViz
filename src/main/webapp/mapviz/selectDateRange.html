@@ -1,46 +1,90 @@
 <div class="row">
 
-	<div class="col-md-6">
-		<h3>Select Date Range for Visualization Playback</h3>
-		<p>Next, select a start and end date/time between which you want to playback
-                the visualization of the available received data. The panel below shows the range
-                between which there is available data ready to visualize:</p>
-	</div>
+    <div class="col-md-6">
+        <div class="row">
+            <div class="col-md-12">
+                <h3>Select Date Range for Visualization Playback</h3>
+                <p>Next, select a start and end date/time between which you want to playback
+                    the visualization of the available received data. The panel below shows the range
+                    between which there is available data ready to visualize:</p>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="panel panel-default fadeInHideShow"
+                     ng-show="search.numberOfSpots > 0">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">Available data for callsign:
+                            {{search.callsign}}</h3>
+                    </div>
+                    <div class="panel-body">
 
-	<div class="col-md-6" style="padding-top: 90px;">
+                        <p>Spots by callsign [{{search.callsign}}] in database:
+                            {{search.numberOfSpots}}</p>
+                        <p>Earliest recorded spot: {{search.formattedFromDate}} UTC</p>
+                        <p>Most recent recorded spot: {{search.formattedEndDate}} UTC</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
-		<div class="row">
-			<div class="col-md-3">
-				<label for="fromDate">Staring from date/time:</label>
-			</div>
-			<div class="col-md-8">
-				<input id="fromDate" class="form-control" ng-model="search.fromDate"
-					ui-date-format="yy'-'mm'-'dd" ui-date="search.fromDateOptions"
-					popover="Select a start date and time from which to start visualizing your reception data.
-                   {{search.popoverTextWhenDataAvailable}}"
-					popover-trigger="focus" />
-				<timepicker ng-model="search.fromTime" minute-step="search.minuteStep"></timepicker>
-			</div>
-		</div>
 
-		<div class="row">
-			<div class="col-md-3">
-				<label for="toDate">Ending at date:</label>
-			</div>
-			<div class="col-md-8">
-				<input id="toDate" class="form-control" ng-model="search.toDate"
-					ui-date-format="yy'-'mm'-'dd" ui-date="search.toDateOptions"
-					popover="End date/time for received spots" popover-placement="left"
-					popover-trigger="focus" />
-				<timepicker ng-model="search.toTime" minute-step="search.minuteStep"></timepicker>
-			</div>
-		</div>
+    <div class="col-md-6" style="padding-top: 90px;">
 
-		<div class="row">
-			<div class="col-md-3">
-				<button class="btn btn-default btn-primary" ng-click="retrieve()">Retrieve
-					data</button>
-			</div>
-		</div>
-	</div>
+        <div class="row">
+            <div class="col-md-3">
+                <label for="fromDate">Staring from date/time:</label>
+            </div>
+            <div class="col-md-8">
+                <input id="fromDate" class="form-control" ng-model="search.fromDate"
+                       ui-date-format="yy'-'mm'-'dd" ui-date="search.fromDateOptions"
+                       popover="Select a start date and time from which to start visualizing your reception data.
+                       {{search.popoverTextWhenDataAvailable}}"
+                       popover-trigger="focus" />
+                <timepicker ng-model="search.fromTime" minute-step="search.minuteStep"></timepicker>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-3">
+                <label for="toDate">Ending at date:</label>
+            </div>
+            <div class="col-md-8">
+                <input id="toDate" class="form-control" ng-model="search.toDate"
+                       ui-date-format="yy'-'mm'-'dd" ui-date="search.toDateOptions"
+                       popover="End date/time for received spots" popover-placement="left"
+                       popover-trigger="focus" />
+                <timepicker ng-model="search.toTime" minute-step="search.minuteStep"></timepicker>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-3">
+                <button class="btn btn-default btn-primary" ng-click="retrieve()">Retrieve
+                    data</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="panel panel-default fadeInHideShow"
+             ng-show="search.showDataDensity ">
+            <div class="panel-heading">
+                <h3 class="panel-title">Distribution of data for selected date range</h3>
+            </div>
+            <div class="panel-body">
+                <p>This chart shows the availability of the uploaded data between your chosen dates. Darker colors indicate
+                    where there is more data available to visualize. If there are many periods with no data available it
+                    may be more interesting to select a different date range that covers where you have consecutive
+                    periods of data to visualize</p>
+                
+                <p>TODO: data here</p>
+                
+                <p>TODO: instruction, reselect or continue</p>
+            </div>
+        </div>
+    </div>
 </div>

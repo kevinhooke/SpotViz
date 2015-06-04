@@ -57,6 +57,9 @@ spotVizControllers.controller('SpotVizController', ['$scope', '$http', '$filter'
         //initial empty array for map marker positions
         $scope.search.positions = [];
 
+        //show data density display
+        $scope.search.showDataDensity = false;
+
         var runningCounter = null;
         $scope.search.debugMsg = null;
         $scope.search.iterations = 0; //number of times the interval runs, 0 = continuous
@@ -132,7 +135,7 @@ spotVizControllers.controller('SpotVizController', ['$scope', '$http', '$filter'
                         $scope.search.formattedFromDate = moment.utc($scope.dateFirstSpot).format("YYYY/MM/DD HH:mm:ss");
                         $scope.search.formattedEndDate = moment.utc($scope.toDate).format("YYYY/MM/DD HH:mm:ss");
 
-                        $scope.search.popoverTextWhenDataAvailable = "For callsign [" + $scope.callsign
+                        $scope.search.popoverTextWhenDataAvailable = "For callsign [" + $scope.search.callsign
                                 + "] there is data available from "
                                 + $scope.search.formattedFromDate + " UTC "
                                 + "and "
@@ -193,13 +196,14 @@ spotVizControllers.controller('SpotVizController', ['$scope', '$http', '$filter'
                     $scope.search.msg = "No data for callsign: " + $scope.callsign;
                     $scope.search.spots = "";
                     $scope.search.markers = [];
+                    $scope.search.showDataDensity = false;
                 } else {
                     $scope.search.msg = "";
                     $scope.search.selectedRangeMsg = "Selected start date : " + formattedFromDate + fromTimeOnly + " UTC "
                             + "end date: " + formattedToDate + " " + toTimeOnly + " UTC "
                             + "Spots for selected date range: " + data.length;
                     $scope.search.spots = data;
-                    $scope.search.showMapControls = true;
+                    $scope.search.showDataDensity = true;
                 }
             }).error(function (data) {
                 $scope.msg = "Failed to retrieve data at this time. Try later?";
