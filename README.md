@@ -1,13 +1,19 @@
-Callsignviz
-===========
+# SpotViz
+Historical visualization of amateur radio received signals using JT65/JT9 modes.
 
-4/4/15 6:23pm updates
+This webapp provides an animated representation of received amateur radio signals 
+over time, displayed using Google Maps.
 
-JAX-RS endpoint for receiving spot data from remote clients running CallsignSpotParserApp.
+I built this app as a learning exercise to try out building a webapp
+using AngularJS for a MV* frontend, against JAX-RS resources.
 
-Spots collected by the endpoint are sent to a JMS queue to be picked up for server-side
-processing and storage. 
+Data is submitted to the server currently via a standalone app that parses
+the log files from WSJT-X (see https://github.com/kevinhooke/WSJTLogParser), 
+and sends to a JAX-WS endpoint. Received data is dropped to a JMS queue for 
+further processing (including location lookup by calling HamQTH, using this
+client API: https://github.com/kevinhooke/HamQTHClient) and is eventualy stored
+to MongoDB for visualization via the AngularJS front end.
 
-Data stored to MongoDB using Hibernate OGM.
+This is very much a work in progress and is not currently live, but will eventually
+be hosted on OpenShift here https://www.spotviz.info
 
-Data is used by the Spot Vizualizer webapp to display spots on a map.
