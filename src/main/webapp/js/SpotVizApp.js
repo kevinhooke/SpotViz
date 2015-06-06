@@ -1,5 +1,5 @@
 var spotVizApp = angular.module('SpotVizApp', [ "ui.router", "ngAnimate",
-		"ui.date", "ngMap", "ui.bootstrap", "SpotVizControllers" ]);
+		"ui.date", "ngMap", "ui.bootstrap", "calHeatmap", "SpotVizControllers" ]);
             
 	spotVizApp.config(function($stateProvider, $urlRouterProvider) {
     

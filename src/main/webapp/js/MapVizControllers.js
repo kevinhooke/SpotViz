@@ -203,6 +203,14 @@ spotVizControllers.controller('SpotVizController', ['$scope', '$http', '$filter'
                             + "end date: " + formattedToDate + " " + toTimeOnly + " UTC "
                             + "Spots for selected date range: " + data.length;
                     $scope.search.spots = data;
+                    
+                    //heatmap
+                    $scope.search.heatmap = {};
+                    $scope.search.heatmap.config = {
+                        domain: "month",
+                        start: new Date(2015, 4, 1)
+                    };
+                    
                     $scope.search.showDataDensity = true;
                 }
             }).error(function (data) {

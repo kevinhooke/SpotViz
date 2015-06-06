@@ -71,7 +71,7 @@
 <div class="row">
     <div class="col-md-12">
         <div class="panel panel-default fadeInHideShow"
-             ng-show="search.showDataDensity ">
+            ng-show="search.showDataDensity">
             <div class="panel-heading">
                 <h3 class="panel-title">Distribution of data for selected date range</h3>
             </div>
@@ -81,10 +81,14 @@
                     may be more interesting to select a different date range that covers where you have consecutive
                     periods of data to visualize</p>
                 
-                <p>TODO: data here</p>
-                
                 <p>TODO: instruction, reselect or continue</p>
             </div>
         </div>
     </div>
+</div>
+<div class="row" ng-show="search.showDataDensity">
+    <div class="col-md-12">
+        <cal-heatmap config="search.heatmap.config"></cal-heatmap>
+    </div>
+
 </div>

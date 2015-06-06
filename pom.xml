@@ -50,6 +50,28 @@
 			<groupId>kh.spotvisualizer</groupId>
 			<artifactId>SpotVisualizerCommon</artifactId>
 			<version>0.0.1-SNAPSHOT</version>
+                        <!--
+                        Atttempting to exclude asm to avoid this issue:
+                        https://developer.jboss.org/thread/229510?start=0&tstart=0
+                        -->
+                        <exclusions>
+                            <exclusion>
+                                <groupId>org.ow2.asm</groupId>
+                                <artifactId>asm</artifactId>
+                            </exclusion>
+                            <exclusion>
+                                <groupId>org.ow2.asm</groupId>
+                                <artifactId>asm-tree</artifactId>
+                            </exclusion>
+                            <exclusion>
+                                <groupId>org.ow2.asm</groupId>
+                                <artifactId>asm-analysis</artifactId>
+                            </exclusion>
+                            <exclusion>
+                                <groupId>org.ow2.asm</groupId>
+                                <artifactId>asm-util</artifactId>
+                            </exclusion>
+                        </exclusions>
 		</dependency>
 
 
