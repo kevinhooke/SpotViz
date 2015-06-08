@@ -22,6 +22,7 @@ public class CallsignProcessorService {
 			.getLogger("kh.callsign.spotcollector.endpoint");
 	
 	@Inject
+	//CallsignProcessorMongoDBDaoImpl from Maven dependency on CallsignSpotDataMongoDB
 	private CallsignProcessorDao dao;
 	
 	private HamQTHClient hamQTHClient;
@@ -41,9 +42,8 @@ public class CallsignProcessorService {
 	public boolean process(Spot spot){
 		boolean successfullyProcessed = false;
 		
-		//has this entry already been submitted, if so do nothing
-		Spot alreadyStored = this.dao.findSpotBySpotterAndTimestamp(spot);
-		if(alreadyStored == null){
+		//has this entry already been submitted, if so do nothing		
+		if(!this.dao.existsSpotBySpotterAndTimestamp(spot)){
 			
 			LOGGER.debug("... new spot: processing");
 			
@@ -73,13 +73,7 @@ public class CallsignProcessorService {
 			
 			spot.setSpotDetail(detail);
 			//store the new spot data
-			this.dao.store(spot);
-			
-			//lookup location via HamQTH
-			
-			//store location updates
-
-			
+			this.dao.create(spot);
 		}
 		else{
 			LOGGER.debug("... duplicate spot: ignoring");

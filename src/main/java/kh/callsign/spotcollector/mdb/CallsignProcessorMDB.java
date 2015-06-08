@@ -6,8 +6,6 @@ import javax.inject.Inject;
 import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.MessageListener;
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
 
 import kh.callsign.spotcollector.service.CallsignProcessorService;
 import kh.radio.spotparser.domain.Spot;

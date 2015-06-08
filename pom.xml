@@ -13,10 +13,6 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<maven.compiler.source>1.8</maven.compiler.source>
 		<maven.compiler.target>1.8</maven.compiler.target>
-                <!-- older openshift properties
-		<maven.compiler.executable>${env.OPENSHIFT_WILDFLY_DIR}usr/lib/jvm/jdk1.8.0_05/bin/javac</maven.compiler.executable>
-		<maven.compiler.fork>true</maven.compiler.fork>
-                -->
 	</properties>
 
 	<dependencies>
@@ -50,30 +46,7 @@
 			<groupId>kh.spotvisualizer</groupId>
 			<artifactId>SpotVisualizerCommon</artifactId>
 			<version>0.0.1-SNAPSHOT</version>
-                        <!--
-                        Atttempting to exclude asm to avoid this issue:
-                        https://developer.jboss.org/thread/229510?start=0&tstart=0
-                        -->
-                        <exclusions>
-                            <exclusion>
-                                <groupId>org.ow2.asm</groupId>
-                                <artifactId>asm</artifactId>
-                            </exclusion>
-                            <exclusion>
-                                <groupId>org.ow2.asm</groupId>
-                                <artifactId>asm-tree</artifactId>
-                            </exclusion>
-                            <exclusion>
-                                <groupId>org.ow2.asm</groupId>
-                                <artifactId>asm-analysis</artifactId>
-                            </exclusion>
-                            <exclusion>
-                                <groupId>org.ow2.asm</groupId>
-                                <artifactId>asm-util</artifactId>
-                            </exclusion>
-                        </exclusions>
 		</dependency>
-
 
 		<dependency>
 			<groupId>kh.mongo</groupId>
@@ -85,8 +58,24 @@
 			<groupId>kh.radio</groupId>
 			<artifactId>hamqthclient</artifactId>
 			<version>0.0.1-SNAPSHOT</version>
+			<exclusions>
+				<exclusion>
+					<artifactId>asm-all-repackaged</artifactId>
+					<groupId>org.glassfish.hk2.external</groupId>
+				</exclusion>
+			</exclusions>
 		</dependency>
-		
+
+		<dependency>
+			<groupId>kh.spotvisualizer</groupId>
+			<artifactId>SpotVisualizerDataCommon</artifactId>
+			<version>0.0.1-SNAPSHOT</version>
+		</dependency>
+		<dependency>
+			<groupId>kh.spotvisualizer</groupId>
+			<artifactId>SpotVisualizerDataMongoDB</artifactId>
+			<version>0.0.1-SNAPSHOT</version>
+		</dependency>
 	</dependencies>
 
 	<profiles>
