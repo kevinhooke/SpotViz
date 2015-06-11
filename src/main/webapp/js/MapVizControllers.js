@@ -54,24 +54,28 @@ spotVizControllers.controller('SpotVizController', ['$scope', '$http', '$filter'
         $scope.search.fromDateOptions = null;
         $scope.search.toDateOptions = null;
 
-        //initial empty array for map marker positions
-        $scope.search.positions = [];
-
         //show data density display
         $scope.search.showDataDensity = false;
 
-        var runningCounter = null;
-        $scope.search.debugMsg = null;
-        $scope.search.iterations = 0; //number of times the interval runs, 0 = continuous
+        //TODO what is this used for?
         $scope.search.date = moment();
-        $scope.search.updateRate = 4; //number of seconds betweeb updates
+        
+        //playback controls
+        var runningCounter = null;
+        //initial empty array for map marker positions
+        $scope.playbackData = {};
+        $scope.playbackData.positions = [];
 
-        $scope.playbackControls = {timeInterval: 15}; //how many minutes the date advances on each iteration
-        $scope.search.state = "Stopped";
+        $scope.playbackControls = {};
+        $scope.playbackControls.timeInterval = 15; //how many minutes the date advances on each iteration
+        $scope.playbackControls.debugMsg = null;
+        $scope.playbackControls.iterations = 0; //number of times the interval runs, 0 = continuous
+        $scope.playbackControls.updateRate = 4; //number of seconds betweeb updates
+        $scope.playbackControls.state = "Stopped";
 
         //progress bar
-        $scope.search.currentValue = 1;
-        $scope.search.currentInterval = 0;
+        $scope.playbackControls.currentValue = 1;
+        $scope.playbackControls.currentInterval = 0;
 
 
         /*
@@ -81,12 +85,12 @@ spotVizControllers.controller('SpotVizController', ['$scope', '$http', '$filter'
 
             var currentIntervalSpots = $filter('spotIntervalFilter')(data, interval, intervalBoundaries);
             //empty the array of positions
-            $scope.search.positions = [];
+            $scope.playbackData.positions = [];
 
-            markerId = 0;
+            var markerId = 0;
             for (var i = 0; i < currentIntervalSpots.length; i++) {
 
-                $scope.search.positions.push({
+                $scope.playbackData.positions.push({
                     lat: currentIntervalSpots[i].spotDetail.latitude,
                     lng: currentIntervalSpots[i].spotDetail.longitude});
             }
@@ -109,7 +113,7 @@ spotVizControllers.controller('SpotVizController', ['$scope', '$http', '$filter'
                         $scope.search.popoverTextWhenDataAvailable = "";
                         $scope.search.numberOfSpots = 0;
                         $scope.search.spots = "";
-                        $scope.search.markers = [];
+                        $scope.playbackData.markers = [];
                     } else {
                         //TODO: setting default from and to dates are not in expected format, but selecting from
                         //picker is in correct format
@@ -132,8 +136,8 @@ spotVizControllers.controller('SpotVizController', ['$scope', '$http', '$filter'
                             maxDate: lastSpotDate
                         };
 
-                        $scope.search.formattedFromDate = moment.utc($scope.dateFirstSpot).format("YYYY/MM/DD HH:mm:ss");
-                        $scope.search.formattedEndDate = moment.utc($scope.toDate).format("YYYY/MM/DD HH:mm:ss");
+                        $scope.search.formattedFromDate = moment.utc($scope.search.dateFirstSpot).format("YYYY/MM/DD HH:mm:ss");
+                        $scope.search.formattedEndDate = moment.utc($scope.search.toDate).format("YYYY/MM/DD HH:mm:ss");
 
                         $scope.search.popoverTextWhenDataAvailable = "For callsign [" + $scope.search.callsign
                                 + "] there is data available from "
@@ -174,13 +178,23 @@ spotVizControllers.controller('SpotVizController', ['$scope', '$http', '$filter'
         }
 
         /*
+         * Navigates to page 3: Playback. 
+         * @returns {undefined}
+         */
+        $scope.navigateToPlayback = function(){
+            
+            $state.go('visualize.playback');
+            
+        }
+
+        /*
          * Retrieves spots for given callsign and date range.
          */
         $scope.retrieve = function () {
-            var fromTimeOnly = moment($scope.fromTime).format("HH:mm:ss");
-            var toTimeOnly = moment($scope.toTime).format("HH:mm:ss");
-            var formattedFromDate = moment($scope.fromDate).format("YYYY-MM-DD");
-            var formattedToDate = moment($scope.toDate).format("YYYY-MM-DD");
+            var fromTimeOnly = moment($scope.search.fromTime).format("HH:mm:ss");
+            var toTimeOnly = moment($scope.search.toTime).format("HH:mm:ss");
+            var formattedFromDate = moment($scope.search.fromDate).format("YYYY-MM-DD");
+            var formattedToDate = moment($scope.search.toDate).format("YYYY-MM-DD");
             $scope.search.selectedStartDateTime = formattedFromDate + "T" + fromTimeOnly + "Z";
             $scope.search.selectedEndDateTime = formattedToDate + "T" + toTimeOnly + "Z";
 
@@ -195,7 +209,7 @@ spotVizControllers.controller('SpotVizController', ['$scope', '$http', '$filter'
                 if (data == {}) {
                     $scope.search.msg = "No data for callsign: " + $scope.callsign;
                     $scope.search.spots = "";
-                    $scope.search.markers = [];
+                    $scope.playbackData.markers = [];
                     $scope.search.showDataDensity = false;
                 } else {
                     $scope.search.msg = "";
@@ -218,6 +232,10 @@ spotVizControllers.controller('SpotVizController', ['$scope', '$http', '$filter'
             });
         }
 
+        //
+        //TODO: need to degub the playback, not working
+        //
+        
         //Start the playback
         $scope.start = function () {
             //if already running, do nothing
@@ -225,12 +243,12 @@ spotVizControllers.controller('SpotVizController', ['$scope', '$http', '$filter'
                 return;
             }
             else {
-                $scope.search.state = "Running";
+                $scope.playbackControls.state = "Running";
                 var intervalBoundaries = [];
-
+                
                 //calc difference in minutes: selectedEndDateTime - selectedStartDateTime
-                var startMoment = moment.utc($scope.selectedStartDateTime);
-                var endMoment = moment.utc($scope.selectedEndDateTime);
+                var startMoment = moment.utc($scope.search.selectedStartDateTime);
+                var endMoment = moment.utc($scope.search.selectedEndDateTime);
                 var diff = moment.duration(endMoment.diff(startMoment));
                 var totalMinutesInSelectedTimeRange = diff.asMinutes();
                 $scope.search.debugMsg = "Minutes: " + totalMinutesInSelectedTimeRange;
@@ -248,7 +266,7 @@ spotVizControllers.controller('SpotVizController', ['$scope', '$http', '$filter'
                     var tempIntervalCount = 0;
                     var currentIntervalStartDate = moment.utc(startMoment);
                     var currentIntervalEndDate = null;
-                    $scope.iterations = numberOfIntervalsInSelectedRange;
+                    $scope.playbackControls.iterations = numberOfIntervalsInSelectedRange;
                     while (tempIntervalCount < numberOfIntervalsInSelectedRange) {
                         //first time through tempIntervalCount=0 so no minutes are added to the start date
                         //time operations modify the original value
@@ -268,12 +286,12 @@ spotVizControllers.controller('SpotVizController', ['$scope', '$http', '$filter'
 
                     runningCounter = $interval(function () {
                         $scope.date = moment($scope.date).add($scope.playbackControls.timeInterval, 'minutes');
-                        $scope.currentInterval = $scope.currentInterval + 1;
+                        $scope.playbackControls.currentInterval = $scope.playbackControls.currentInterval + 1;
 
                         //add subset of spots to markers for display
-                        createMarkersFromData($scope.spots, $scope.currentInterval, intervalBoundaries);
+                        createMarkersFromData($scope.search.spots, $scope.playbackControls.currentInterval, intervalBoundaries);
 
-                    }, 1000 * $scope.updateRate, $scope.iterations);
+                    }, 1000 * $scope.playbackControls.updateRate, $scope.playbackControls.iterations);
                 }
             }
         }

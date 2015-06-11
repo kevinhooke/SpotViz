@@ -1,59 +1,56 @@
 
-<div class="container-fluid">
-
-	<div class="row">
-		<div class="col-sm-6">
-			<p>{{date}}</p>
-		</div>
+<div class="row">
+	<div class="col-sm-6">
+		<p>{{date}}</p>
 	</div>
+</div>
 
-	<div class="row">
-		<div class="col-sm-12">
-			<p>
-				Interval rate: <select ng-model="playbackControls.timeInterval"
-					ng-change="chnageIntervalLength()">
-					<option value="5">5 mins</option>
-					<option value="10">10 mins</option>
-					<option value="15">15 mins</option>
-					<option value="30">30 mins</option>
-					<option value="60">1 hour</option>
-					<option value="120">2 hours</option>
-					<option value="180">3 hours</option>
-				</select>
+<div class="row">
+	<div class="col-sm-12">
+		<p>
+			Interval rate: <select ng-model="playbackControls.timeInterval"
+				ng-change="changeIntervalLength()">
+				<option value="5">5 mins</option>
+				<option value="10">10 mins</option>
+				<option value="15">15 mins</option>
+				<option value="30">30 mins</option>
+				<option value="60">1 hour</option>
+				<option value="120">2 hours</option>
+				<option value="180">3 hours</option>
+			</select> Update rate: <select ng-model="playbackControls.updateRate" ng-change="changeRate()">
+				<option value="1">1 secs</option>
+				<option value="2">2 secs</option>
+				<option value="3">3 secs</option>
+				<option value="4">4 secs</option>
+			</select>
 
-				Update rate: <select ng-model="updateRate" ng-change="changeRate()">
-					<option value="1">1 secs</option>
-					<option value="2">2 secs</option>
-					<option value="3">3 secs</option>
-					<option value="4">4 secs</option>
-				</select>
+			<button class="btn btn-primary" data-ng-click="start()">
+				<span class="glyphicon glyphicon-play" aria-hidden="true"></span>Start
+			</button>
 
-				<button class="btn btn-primary" data-ng-click="start()">
-					<span class="glyphicon glyphicon-play" aria-hidden="true"></span>Start
-				</button>
+			<button class="btn btn-primary" data-ng-click="stop()">
+				<span class="glyphicon glyphicon-pause" aria-hidden="true"></span>Pause
+			</button>
 
-				<button class="btn btn-primary" data-ng-click="stop()">
-					<span class="glyphicon glyphicon-pause" aria-hidden="true"></span>Pause
-				</button>
-				
-				<button class="btn btn-primary" data-ng-click="reset()">
-					<span class="glyphicon glyphicon-pause" aria-hidden="true"></span>Reset
-				</button>
-				
-				State: {{state}} / current playback interval: {{currentInterval}} / 
-				Debug: {{debugMsg}} 
-			<p>
-		</div>		
+			<button class="btn btn-primary" data-ng-click="reset()">
+				<span class="glyphicon glyphicon-pause" aria-hidden="true"></span>Reset
+			</button>
+
+			State: {{playbackControls.state}} / current playback interval: {{playbackControls.currentInterval}} /
+			Debug: {{searchdebugMsg}}
+		<p>
 	</div>
-	
-	<div class="row">
-			<div class="col-sm-12">
-				<progressbar max="maxValue" value="currentInterval" type="info"></progressbar>
-			</div>
-			<div></div><div></div>
+</div>
+
+<div class="row">
+	<div class="col-sm-12">
+		<progressbar max="maxValue" value="currentInterval" type="info"></progressbar>
 	</div>
-	<div class="row">
-			<div class="col-sm-2">{{selectedStartDateTime}}</div>
-			<div class="col-sm-offset-8 col-sm-2">{{selectedEndDateTime}}</div>
+	<div></div>
+	<div></div>
+</div>
+<div class="row">
+	<div class="col-sm-2">{{selectedStartDateTime}}</div>
+	<div class="col-sm-offset-8 col-sm-2">{{selectedEndDateTime}}</div>
 </div>
 
