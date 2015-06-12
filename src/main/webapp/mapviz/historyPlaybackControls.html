@@ -1,11 +1,5 @@
 
 <div class="row">
-	<div class="col-sm-6">
-		<p>{{date}}</p>
-	</div>
-</div>
-
-<div class="row">
 	<div class="col-sm-12">
 		<p>
 			Interval rate: <select ng-model="playbackControls.timeInterval"
@@ -28,7 +22,7 @@
 				<span class="glyphicon glyphicon-play" aria-hidden="true"></span>Start
 			</button>
 
-			<button class="btn btn-primary" data-ng-click="stop()">
+			<button class="btn btn-primary" data-ng-click="pause()">
 				<span class="glyphicon glyphicon-pause" aria-hidden="true"></span>Pause
 			</button>
 
@@ -36,21 +30,47 @@
 				<span class="glyphicon glyphicon-pause" aria-hidden="true"></span>Reset
 			</button>
 
-			State: {{playbackControls.state}} / current playback interval: {{playbackControls.currentInterval}} /
-			Debug: {{searchdebugMsg}}
+			State: {{playbackControls.state}}
 		<p>
 	</div>
 </div>
-
 <div class="row">
-	<div class="col-sm-12">
-		<progressbar max="maxValue" value="currentInterval" type="info"></progressbar>
+	<div class="col-sm-6">
+		<div class="row">
+			<div class="col-sm-6">Playing interval
+				{{playbackControls.currentInterval}}</div>
+			<div class="col-sm-6">of {{playbackControls.currentInterval}}</div>
+		</div>
+		<div class="row">
+			<div class="col-sm-12">
+			{{playbackControls.noSpotsInIntervalMsg}}
+			</div>
+		</div>
 	</div>
-	<div></div>
-	<div></div>
+	<div class="col-sm-6">
+		<div class="row">
+			<div class="col-sm-3">From</div>
+			<div class="col-sm-9">
+				{{playbackControls.intervalBoundaries[playbackControls.currentInterval].intervalStartDate}}
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-sm-3">to</div>
+			<div class="col-sm-9">
+				{{playbackControls.intervalBoundaries[playbackControls.currentInterval].intervalEndDate}}
+			</div>
+		</div>
+	</div>
 </div>
 <div class="row">
-	<div class="col-sm-2">{{selectedStartDateTime}}</div>
-	<div class="col-sm-offset-8 col-sm-2">{{selectedEndDateTime}}</div>
-</div>
-
+			<div class="col-sm-12">
+				<progressbar max="playbackControls.maxValue"
+					value="playbackControls.currentInterval" type="info"></progressbar>
+			</div>
+			<div></div>
+			<div></div>
+		</div>
+		<div class="row">
+			<div class="col-sm-2">{{selectedStartDateTime}}</div>
+			<div class="col-sm-offset-8 col-sm-2">{{selectedEndDateTime}}</div>
+		</div>

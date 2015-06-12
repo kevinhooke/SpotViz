@@ -56,19 +56,26 @@ public class CallsignProcessorService {
 			HamQTHSearch searchResult = this.hamQTHClient.lookupCallsign(spot.getWord2());
 			Search search = searchResult.getSearch();
 
-			//update spot with geo info
 			SpotDetail detail = new SpotDetail();
 			detail.setDateLastProcessed(new Date());
-			
-			//TODO: need to check for an error message here
-			if(search.getLatitude() != null){
-				detail.setErrorMessage("success");
-				detail.setLatitude(search.getLatitude());
-				detail.setLongitude(search.getLongitude());
+
+			if(search != null){
+				//update spot with geo info
+				
+				//TODO: need to check for an error message here
+				if(search.getLatitude() != null){
+					detail.setErrorMessage("success");
+					detail.setLatitude(search.getLatitude());
+					detail.setLongitude(search.getLongitude());
+				}
+				else{
+					detail.setStatus("error");
+					detail.setErrorMessage("No lat/long info returned from HamQTH");
+				}
 			}
 			else{
 				detail.setStatus("error");
-				detail.setErrorMessage("No lat/long info");
+				detail.setErrorMessage("No response frm HamQTH, or failed lookup (unknown callsign?)");
 			}
 			
 			spot.setSpotDetail(detail);

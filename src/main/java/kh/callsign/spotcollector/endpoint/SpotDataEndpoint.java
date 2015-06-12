@@ -168,6 +168,7 @@ public class SpotDataEndpoint {
 
 	private String retrieveSinglePage(String spotterCallsign, ZonedDateTime startDateCurrentPage, 
 			ZonedDateTime endDateCurrentPage, DBCursor c, DBCollection col) {
+		//TODO: needs to retrieve spots where lat/log is available
 		String jsonString = null;
 		BasicDBObject query = new BasicDBObject("spotter", spotterCallsign);
 		query.append("spotReceivedTimestamp", 

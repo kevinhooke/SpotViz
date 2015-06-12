@@ -48,7 +48,7 @@ spotVizControllers.controller('SpotVizController', ['$scope', '$http', '$filter'
         $scope.search.selectedStartDateTime = null;
         $scope.search.selectedEndDateTime = null;
 
-        $scope.search.minuteStep = 15;
+        
 
         //default from and to date options for date pickers
         $scope.search.fromDateOptions = null;
@@ -67,10 +67,12 @@ spotVizControllers.controller('SpotVizController', ['$scope', '$http', '$filter'
         $scope.playbackData.positions = [];
 
         $scope.playbackControls = {};
-        $scope.playbackControls.timeInterval = 15; //how many minutes the date advances on each iteration
+        $scope.search.minuteStep = 5; //TODO: is this used? replaced my timeInterval
+        $scope.playbackControls.timeInterval = 5; //how many minutes the date advances on each iteration
         $scope.playbackControls.debugMsg = null;
+        $scope.playbackControls.noSpotsInIntervalMsg = "";
         $scope.playbackControls.iterations = 0; //number of times the interval runs, 0 = continuous
-        $scope.playbackControls.updateRate = 4; //number of seconds betweeb updates
+        $scope.playbackControls.updateRate = 2; //number of seconds betweeb updates
         $scope.playbackControls.state = "Stopped";
 
         //progress bar
@@ -79,7 +81,7 @@ spotVizControllers.controller('SpotVizController', ['$scope', '$http', '$filter'
 
 
         /*
-         * Creates array of markers from data
+         * Creates array of markers from data for the currently playing interval.
          */
         function createMarkersFromData(data, interval, intervalBoundaries) {
 
@@ -87,12 +89,16 @@ spotVizControllers.controller('SpotVizController', ['$scope', '$http', '$filter'
             //empty the array of positions
             $scope.playbackData.positions = [];
 
-            var markerId = 0;
-            for (var i = 0; i < currentIntervalSpots.length; i++) {
-
-                $scope.playbackData.positions.push({
-                    lat: currentIntervalSpots[i].spotDetail.latitude,
-                    lng: currentIntervalSpots[i].spotDetail.longitude});
+            if(currentIntervalSpots.length == 0){
+            	$scope.playbackControls.noSpotsInIntervalMsg = "No spots in this interval!";
+            }
+            else{
+                for (var i = 0; i < currentIntervalSpots.length; i++) {
+                	$scope.playbackControls.noSpotsInIntervalMsg = "Spots in this interval: " + currentIntervalSpots.length;
+                    $scope.playbackData.positions.push({
+                        lat: currentIntervalSpots[i].spotDetail.latitude,
+                        lng: currentIntervalSpots[i].spotDetail.longitude});
+                }
             }
         }
 
@@ -244,7 +250,7 @@ spotVizControllers.controller('SpotVizController', ['$scope', '$http', '$filter'
             }
             else {
                 $scope.playbackControls.state = "Running";
-                var intervalBoundaries = [];
+                $scope.playbackControls.intervalBoundaries = [];
                 
                 //calc difference in minutes: selectedEndDateTime - selectedStartDateTime
                 var startMoment = moment.utc($scope.search.selectedStartDateTime);
@@ -268,15 +274,16 @@ spotVizControllers.controller('SpotVizController', ['$scope', '$http', '$filter'
                     var currentIntervalEndDate = null;
                     $scope.playbackControls.iterations = numberOfIntervalsInSelectedRange;
                     while (tempIntervalCount < numberOfIntervalsInSelectedRange) {
-                        //first time through tempIntervalCount=0 so no minutes are added to the start date
-                        //time operations modify the original value
-                        currentIntervalStartDate = moment.utc(currentIntervalStartDate)
-                                .add((tempIntervalCount * $scope.playbackControls.timeInterval), 'minutes');
-                        //TODO: need to check time ranges are inclusive and we don't loose anything in a gap
+
+
+                    	currentIntervalStartDate = moment.utc(currentIntervalStartDate)
+                        .add($scope.playbackControls.timeInterval, 'minutes');
+
+                    	//TODO: need to check time ranges are inclusive and we don't loose anything in a gap
                         currentIntervalEndDate = moment.utc(currentIntervalStartDate);
                         currentIntervalEndDate.add($scope.playbackControls.timeInterval, 'minutes');
 
-                        intervalBoundaries[tempIntervalCount] = {
+                        $scope.playbackControls.intervalBoundaries[tempIntervalCount] = {
                             intervalStartDate: currentIntervalStartDate,
                             intervalEndDate: currentIntervalEndDate
                         };
@@ -289,7 +296,8 @@ spotVizControllers.controller('SpotVizController', ['$scope', '$http', '$filter'
                         $scope.playbackControls.currentInterval = $scope.playbackControls.currentInterval + 1;
 
                         //add subset of spots to markers for display
-                        createMarkersFromData($scope.search.spots, $scope.playbackControls.currentInterval, intervalBoundaries);
+                        createMarkersFromData($scope.search.spots, $scope.playbackControls.currentInterval, 
+                        		$scope.playbackControls.intervalBoundaries);
 
                     }, 1000 * $scope.playbackControls.updateRate, $scope.playbackControls.iterations);
                 }
@@ -298,12 +306,19 @@ spotVizControllers.controller('SpotVizController', ['$scope', '$http', '$filter'
 
 
         //Stops the current running playback
-        $scope.stop = function () {
+        $scope.pause = function () {
             if ($interval.cancel(runningCounter)) {
-                $scope.search.state = "Stopped";
+                $scope.playbackControls.state = "Paused";
                 runningCounter = null;
             }
 
+        }
+
+        //Resets current running playback ready for playback from start
+        $scope.reset = function () {
+            $scope.cancel();
+            $scope.playbackControls.currentValue = 1;
+            $scope.playbackControls.currentInterval = 0;
         }
 
         //Cancels the current running playback
@@ -314,16 +329,8 @@ spotVizControllers.controller('SpotVizController', ['$scope', '$http', '$filter'
 
         }
 
-        //Resets current running playback ready for playback from start
-        $scope.reset = function () {
-            $scope.cancel();
-            $scope.currentValue = 1;
-            $scope.currentInterval = 0;
-        }
-
-
         //Changes the length of time in each interval
-        $scope.chnageIntervalLength = function () {
+        $scope.changeIntervalLength = function () {
             //TODO
         }
 
@@ -333,7 +340,7 @@ spotVizControllers.controller('SpotVizController', ['$scope', '$http', '$filter'
             $scope.cancel();
             runningCounter = $interval(function () {
                 $scope.date = moment($scope.date).add($scope.playbackControls.timeInterval, 'minutes');
-            }, 1000 * $scope.updateRate, $scope.iterations);
+            }, 1000 * $scope.playbackControls.updateRate, $scope.playbackControls.iterations);
         };
 
     }]);
