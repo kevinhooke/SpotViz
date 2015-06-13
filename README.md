@@ -17,5 +17,3 @@ to MongoDB for visualization via the AngularJS front end.
 This is very much a work in progress but is hosted on OpenShift here https://www.spotviz.info 
 - if you try out the app and have any feedback/enhancement suggestions/bugs, please
 log them on my project issue tracker here: https://github.com/kevinhooke/SpotViz/issues
-
-
