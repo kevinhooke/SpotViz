@@ -14,6 +14,8 @@ further processing (including location lookup by calling HamQTH, using this
 client API: https://github.com/kevinhooke/HamQTHClient) and is eventualy stored
 to MongoDB for visualization via the AngularJS front end.
 
-This is very much a work in progress and is not currently live, but will eventually
-be hosted on OpenShift here https://www.spotviz.info
+This is very much a work in progress but is hosted on OpenShift here https://www.spotviz.info 
+- if you try out the app and have any feedback/enhancement suggestions/bugs, please
+log them on my project issue tracker here: https://github.com/kevinhooke/SpotViz/issues
+
 
