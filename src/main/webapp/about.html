@@ -1,17 +1,70 @@
 <div class="row">
-		<div class="col-md-12">
-			<p>About context here</p>
+	<div class="col-md-12">
+		<h3>About SpotViz</h3>
+		<p>In addition to hopefully providing an interesting service to visualize the geographic location
+		of received signals over time, this app has been (and still is) a personal development playground 
+		for trying out some different 
+		technologies for building a webapp in a 'single page application' style, using AngularJS for the 
+		front-end, and a Java EE7 based back end. The source for the app is
+		available on GitHub <a href="https://github.com/kevinhooke/SpotViz" target="_blank">here</a>.</p>
+		<p>Here's a summary of some of the technologies/libraries used
+		to build this app: </p>
 		</div>
 </div>
 
 <div class="row">
-	<div class="col-md-1">
-		Callsign QTH information provided by:	
+	<div class="col-md-3">
+	<a target="_blank" href="https://angularjs.org/"><img src="images/AngularJS-small.png"/></a>
 	</div>
-	<div class="col-md-1">
-		<a target="_new" href="http://www.hamqth.com">
+	<div class="col-md-9">
+		<p>The front-end client for this site is using AngularJS. Data for display is retrieved as needed
+		by calling JAX-RS resources running on WildFly. All the processing of the data into intervals
+		for display is achieved with JavasScript and AngularJS.</p>
+	</div>
+</div>
+
+<div class="row">
+	<div class="col-md-3">
+	<a target="_blank" href="http://wildfly.org/"><img src="images/wildfly_logo_200px.png"/></a>
+	</div>
+	<div class="col-md-9">
+		<p>The backend for the app, mainly JAX-RS resources and data access to a MongoDB database, is running
+		on a <a target="_blank" href="http://wildfly.org/">WildFly 8.1</a> cartridge hosted on 
+		<a target="_blank" href="https://www.openshift.com/">OpenShift</a>.</p>
+	</div>
+</div>
+
+<div class="row">
+	<div class="col-md-3">
+	</div>
+	<div class="col-md-9">
+	</div>
+</div>
+
+<div class="row">
+	<div class="col-md-3">
+	</div>
+	<div class="col-md-9">
+	</div>
+</div>
+
+<div class="row">
+	<div class="col-md-3">
+	</div>
+	<div class="col-md-9">
+	</div>
+</div>
+
+
+<div class="row">
+	<div class="col-md-3">
+		<a target="_blank" href="http://www.hamqth.com">
 		<img src="http://www.hamqth.com/images/hamqth_125x125.png" border="1" height="125" width="125" alt="HamQTH.com - Free hamradio callbook">
 		</a>
+	</div>
+	<div class="col-md-9">
+		<p>Location data for received callsigns is looked up using HamQTH webservice API. See 
+		<a target="_blank" href="http://www.hamqth.com/developers.php">here for more info.</a></p>	
 	</div>
 
 </div>
