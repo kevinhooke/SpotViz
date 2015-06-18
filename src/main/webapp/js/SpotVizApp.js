@@ -1,6 +1,7 @@
 var spotVizApp = angular.module('SpotVizApp', [ "ui.router", "ngAnimate",
-		"ui.date", "ngMap", "ui.bootstrap", "calHeatmap", "SpotVizControllers" ]);
-            
+		"ui.date", "ngMap", "ui.bootstrap", "calHeatmap", "SpotVizControllers", 
+		"angulartics", "angulartics.google.analytics" ]);
+
 	spotVizApp.config(function($stateProvider, $urlRouterProvider) {
     
     $stateProvider    
@@ -84,6 +85,8 @@ var spotVizApp = angular.module('SpotVizApp', [ "ui.router", "ngAnimate",
     $urlRouterProvider.otherwise('/home');
 });
 
+	
+	
 //prior ngRoute approach
 //
 //var spotVizApp = angular.module('SpotVizApp', [ "ngRoute", "ngAnimate",
