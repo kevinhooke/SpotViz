@@ -39,7 +39,6 @@ public class SpotDataEndpoint {
 
 	private DateTimeFormatter dateFormatter = DateTimeFormatter.ISO_DATE_TIME;
 
-	
 	/**
 	 * Returns last 10 stored for all spotter callsigns.
 	 * 
@@ -68,35 +67,93 @@ public class SpotDataEndpoint {
 	}
 
 	/**
+	 * Retrieves counts, first and last spots for 20 largest number of uploads.
+	 */
+	@GET
+	@Path("/topUploads")
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response getTopLargestUploads() {
+		// db.Spot.aggregate( [ { $group : { _id : {"spotterCallsign" :
+		// "$spotter"},
+		// count : {$sum : 1},
+		// firstSpot : {$min : "$spotReceivedTimestamp"},
+		// lastSpot : {$max : "$spotReceivedTimestamp"} } } ] )
+		Response response = null;
+		String jsonString = null;
+		StringBuilder jsonResult = new StringBuilder();
+		try {
+
+			DBCursor c = null;
+			DB db = MongoConnection.getMongoDB();
+			DBCollection col = db.getCollection("Spot");
+
+			// $group
+			DBObject groupFields = new BasicDBObject("_id", "$spotter");
+			groupFields.put("firstSpot", new BasicDBObject("$min", "$spotReceivedTimestamp"));
+			groupFields.put("lastSpot", new BasicDBObject("$max", "$spotReceivedTimestamp"));
+			groupFields.put("totalSpots", new BasicDBObject("$sum", 1));
+			DBObject group = new BasicDBObject("$group", groupFields);
+
+			List<DBObject> pipeline = Arrays.asList(group);
+
+			AggregationOutput output = col.aggregate(pipeline);
+			jsonResult.append("{ \"topUploads\" : [ ");
+			boolean firstResult = true;
+			for (DBObject result : output.results()) {
+				if(firstResult){
+					firstResult = false;
+				}
+				else{
+					jsonResult.append(", ");	
+				}
+				jsonString = JSON.serialize(result);
+				jsonResult.append(jsonString);
+			}
+			jsonResult.append("] }");
+			if (jsonString == null) {
+				jsonString = "{}";
+			}
+			response = Response.status(Status.OK).entity(jsonResult.toString()).build();
+		} catch (UnknownHostException e) {
+			response = Response.status(Status.INTERNAL_SERVER_ERROR)
+					.entity("Error connecting to MongoDB").build();
+		}
+		
+		return response;
+	}
+
+	/**
 	 * Returns spots for given spotter callsign within date range. If no date
 	 * range passed, return a summary for the given callsign.
-	 * @param callsign spotter callsign
-	 * @param fromdate starting date for spots
-	 * @param todate retrieve spots up to this maximum date
-	 * @param interval the length of time for an array of spots
-	 * @param flatPages if true, retrieves up to the maxiumum number of spots per page, otherwise
-	 * returns results as a nested array of arrays, with each nested array containing the spots
-	 * for that interval
+	 * 
+	 * @param callsign
+	 *            spotter callsign
+	 * @param fromdate
+	 *            starting date for spots
+	 * @param todate
+	 *            retrieve spots up to this maximum date
+	 * @param interval
+	 *            the length of time for an array of spots
+	 * @param flatPages
+	 *            if true, retrieves up to the maxiumum number of spots per
+	 *            page, otherwise returns results as a nested array of arrays,
+	 *            with each nested array containing the spots for that interval
 	 * @return
 	 */
 	@GET
 	@Path("/spots/{callsign}")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getSpotsForCallsignBetweenDateRane(@PathParam("callsign") String callsign,
-			@QueryParam("fromdate") String fromDate, 
-			@QueryParam("todate") String toDate,
-			@QueryParam("interval") int interval,
-			@QueryParam("flatpages") Boolean flatPages) {
+			@QueryParam("fromdate") String fromDate, @QueryParam("todate") String toDate,
+			@QueryParam("interval") int interval, @QueryParam("flatpages") Boolean flatPages) {
 		Response response = null;
-		
-		//flatpages defaults to true
-		if(flatPages == null){
+
+		// flatpages defaults to true
+		if (flatPages == null) {
 			flatPages = Boolean.TRUE;
-		} 
-		else{
+		} else {
 			flatPages = Boolean.FALSE;
 		}
-		
 
 		try {
 			DB db = MongoConnection.getMongoDB();
@@ -108,39 +165,45 @@ public class SpotDataEndpoint {
 				c = col.find().sort(new BasicDBObject("spotReceivedTimestamp", 1)).limit(10);
 			} else {
 				try {
-					
-					//todo: if flatpages, retrieve up to the maximum number of spots
-					//in one page, otherwise return the nested arrarys of arrays
-					
-					
-					//todo: retrieve multiple arrays of spots, each array per interval
-					//assemble array of arrays (JSONP) for response up to maxIntervals
-					//starting point: maxSpots=100, so if interval=15mins, retrieve
-					//spots for 15mins, add to array, if total spots so far < 100
-					//then retrieve next 15min interval, add to array, and repeat
-					
-					//first retrieve: startDate to startDate + interval (lastDateRetrieved)
-					//next retrieve: lastDateRetrieved to lastDateRetrieved+interval
-					//continue up to max spots, or up to lastDateRetrieved => fromDate
-					
+
+					// todo: if flatpages, retrieve up to the maximum number of
+					// spots
+					// in one page, otherwise return the nested arrarys of
+					// arrays
+
+					// todo: retrieve multiple arrays of spots, each array per
+					// interval
+					// assemble array of arrays (JSONP) for response up to
+					// maxIntervals
+					// starting point: maxSpots=100, so if interval=15mins,
+					// retrieve
+					// spots for 15mins, add to array, if total spots so far <
+					// 100
+					// then retrieve next 15min interval, add to array, and
+					// repeat
+
+					// first retrieve: startDate to startDate + interval
+					// (lastDateRetrieved)
+					// next retrieve: lastDateRetrieved to
+					// lastDateRetrieved+interval
+					// continue up to max spots, or up to lastDateRetrieved =>
+					// fromDate
 
 					ZonedDateTime fromDateParsed = null;
 					ZonedDateTime toDateParsed = null;
 
-					
 					if (fromDate != null && toDate != null) {
 						fromDateParsed = parseDateStringToUTC(fromDate);
 						toDateParsed = parseDateStringToUTC(toDate);
-						
-						if(flatPages){
-							//build flat document of results
-							jsonString = retrieveSinglePage(callsign, fromDateParsed, 
-									toDateParsed, c, col);
-						}
-						else{
-							//build paginated nested docs of results
+
+						if (flatPages) {
+							// build flat document of results
+							jsonString = retrieveSinglePage(callsign, fromDateParsed, toDateParsed,
+									c, col);
+						} else {
+							// build paginated nested docs of results
 							jsonString = buildPaginatedSearchResult(callsign, interval, col,
-									jsonString, fromDateParsed, toDateParsed);							
+									jsonString, fromDateParsed, toDateParsed);
 						}
 					} else {
 						jsonString = this.retrieveSpotSummaryForCallsign(col, callsign);
@@ -166,17 +229,17 @@ public class SpotDataEndpoint {
 		return ZonedDateTime.parse(fromDate, dateFormatter);
 	}
 
-	private String retrieveSinglePage(String spotterCallsign, ZonedDateTime startDateCurrentPage, 
+	private String retrieveSinglePage(String spotterCallsign, ZonedDateTime startDateCurrentPage,
 			ZonedDateTime endDateCurrentPage, DBCursor c, DBCollection col) {
-		//TODO: needs to retrieve spots where lat/log is available
+		// TODO: needs to retrieve spots only where lat/log is available
 		String jsonString = null;
 		BasicDBObject query = new BasicDBObject("spotter", spotterCallsign);
-		query.append("spotReceivedTimestamp", 
-				new BasicDBObject("$gte", Date.from(startDateCurrentPage.toInstant()))
-					.append("$lt", Date.from(endDateCurrentPage.toInstant())));
-		c = col.find(query).sort(new BasicDBObject("spotReceivedTimestamp", 1))
-				.limit(200); //max 200 spots per interval
-		
+		query.append("spotReceivedTimestamp",
+				new BasicDBObject("$gte", Date.from(startDateCurrentPage.toInstant())).append(
+						"$lt", Date.from(endDateCurrentPage.toInstant())));
+		// max 200 spots per interval
+		c = col.find(query).sort(new BasicDBObject("spotReceivedTimestamp", 1)).limit(200); 
+
 		jsonString = JSON.serialize(c);
 		return jsonString;
 	}
@@ -188,56 +251,58 @@ public class SpotDataEndpoint {
 		ZonedDateTime endDateCurrentPage;
 		startDateCurrentPage = fromDateParsed;
 		endDateCurrentPage = startDateCurrentPage.plus(interval, ChronoUnit.MINUTES);
-		
-		//start building result doc
+
+		// start building result doc
 		JsonObjectBuilder builder = Json.createObjectBuilder();
 		JsonArrayBuilder spotsPerIntervalBuilder = Json.createArrayBuilder();
 		/*
-
-		  "itemsThisPage" : n,
-		  "incrementSize" : 15,
-		  "moreItems": true
-		  
-		  */
+		 * 
+		 * "itemsThisPage" : n, "incrementSize" : 15, "moreItems": true
+		 */
 		builder.add("incrementSize", interval);
-		
-		//while the end DateTime of the current page is < requested end date
-		while(endDateCurrentPage.isBefore(toDateParsed)){
+
+		// while the end DateTime of the current page is < requested end date
+		while (endDateCurrentPage.isBefore(toDateParsed)) {
 			BasicDBObject query = new BasicDBObject("spotter", callsign);
-			query.append("spotReceivedTimestamp", new BasicDBObject("$gte",
-					startDateCurrentPage).append("$lt", Date.from(endDateCurrentPage.toInstant())));
-			c = col.find(query).sort(new BasicDBObject("spotReceivedTimestamp", 1))
-					.limit(200); //max 200 spots per interval
-			
+			query.append(
+					"spotReceivedTimestamp",
+					new BasicDBObject("$gte", startDateCurrentPage).append("$lt",
+							Date.from(endDateCurrentPage.toInstant())));
+			c = col.find(query).sort(new BasicDBObject("spotReceivedTimestamp", 1)).limit(200); // max
+																								// 200
+																								// spots
+																								// per
+																								// interval
+
 			JSON json = new JSON();
 			jsonString = json.serialize(c);
-			
-			//TODO here - build array of results then add to array
-			
+
+			// TODO here - build array of results then add to array
+
 		}
 		return jsonString;
 	}
 
 	private String retrieveSpotSummaryForCallsign(DBCollection col, String callsign) {
 		String jsonResult = null;
-		//$match
+		// $match
 		DBObject match = new BasicDBObject("$match", new BasicDBObject("spotter", callsign));
-		
-		//$group
-		DBObject groupFields = new BasicDBObject( "_id", "$spotter");
-		groupFields.put("firstSpot", new BasicDBObject( "$min", "$spotReceivedTimestamp"));
-		groupFields.put("lastSpot", new BasicDBObject( "$max", "$spotReceivedTimestamp"));
-		groupFields.put("totalSpots", new BasicDBObject( "$sum", 1));
+
+		// $group
+		DBObject groupFields = new BasicDBObject("_id", "$spotter");
+		groupFields.put("firstSpot", new BasicDBObject("$min", "$spotReceivedTimestamp"));
+		groupFields.put("lastSpot", new BasicDBObject("$max", "$spotReceivedTimestamp"));
+		groupFields.put("totalSpots", new BasicDBObject("$sum", 1));
 		DBObject group = new BasicDBObject("$group", groupFields);
-		
+
 		List<DBObject> pipeline = Arrays.asList(match, group);
-		
+
 		AggregationOutput output = col.aggregate(pipeline);
 		for (DBObject result : output.results()) {
 			jsonResult = JSON.serialize(result);
-		    break;
+			break;
 		}
-		if(jsonResult == null){
+		if (jsonResult == null) {
 			jsonResult = "{}";
 		}
 		return jsonResult;
