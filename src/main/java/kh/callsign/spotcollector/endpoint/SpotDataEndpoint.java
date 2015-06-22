@@ -123,6 +123,82 @@ public class SpotDataEndpoint {
 	}
 
 	/**
+	 * Retrieves spot counts per date for Heatmap display. Groups spot counts per day.
+	 */
+	@GET
+	@Path("/heatmapCounts")
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response getHeatmapCountsForCallsignAndDateRange(@PathParam("callsign") String callsign,
+			@QueryParam("fromdate") String fromDate, @QueryParam("todate") String toDate){
+		
+		/*
+		db.Spot.aggregate(
+		[
+    		{$match: {spotter: "kk6dct"}}, 
+    		{$group: { _id : {
+        		year:{$year:"$spotReceivedTimestamp"},
+        		month:{$month:"$spotReceivedTimestamp"},
+        		day:{$dayOfMonth:"$spotReceivedTimestamp"}        
+        	},
+    		count:{$sum: 1 }
+    		}
+    		}
+		])
+		*/
+		
+		Response response = null;
+		String jsonString = null;
+		StringBuilder jsonResult = new StringBuilder();
+		try {
+
+			DBCursor c = null;
+			DB db = MongoConnection.getMongoDB();
+			DBCollection col = db.getCollection("Spot");
+
+			// $match
+			
+			//TODO
+			
+			// $group
+			
+			//TODO
+			
+			DBObject groupFields = new BasicDBObject("_id", "$spotter");
+			groupFields.put("firstSpot", new BasicDBObject("$min", "$spotReceivedTimestamp"));
+			groupFields.put("lastSpot", new BasicDBObject("$max", "$spotReceivedTimestamp"));
+			groupFields.put("totalSpots", new BasicDBObject("$sum", 1));
+			DBObject group = new BasicDBObject("$group", groupFields);
+
+			List<DBObject> pipeline = Arrays.asList(group);
+
+			AggregationOutput output = col.aggregate(pipeline);
+			jsonResult.append("{ \"topUploads\" : [ ");
+			boolean firstResult = true;
+			for (DBObject result : output.results()) {
+				if(firstResult){
+					firstResult = false;
+				}
+				else{
+					jsonResult.append(", ");	
+				}
+				jsonString = JSON.serialize(result);
+				jsonResult.append(jsonString);
+			}
+			jsonResult.append("] }");
+			if (jsonString == null) {
+				jsonString = "{}";
+			}
+			response = Response.status(Status.OK).entity(jsonResult.toString()).build();
+		} catch (UnknownHostException e) {
+			response = Response.status(Status.INTERNAL_SERVER_ERROR)
+					.entity("Error connecting to MongoDB").build();
+		}
+		
+		return response;
+	}
+	
+	
+	/**
 	 * Returns spots for given spotter callsign within date range. If no date
 	 * range passed, return a summary for the given callsign.
 	 * 
