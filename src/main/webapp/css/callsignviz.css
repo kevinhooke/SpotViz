@@ -60,4 +60,12 @@ body {
 .popover-content {
 width: 200px;
 }
+
+/* > max range css for cal-heatmap: q6 is used for anything > the highest value in the heatmap range */
+.q6
+{
+	background-color: #3b6427;
+	fill: #14250c
+}
+
 		

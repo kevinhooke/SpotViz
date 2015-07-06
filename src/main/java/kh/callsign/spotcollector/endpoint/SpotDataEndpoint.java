@@ -1,11 +1,11 @@
 package kh.callsign.spotcollector.endpoint;
 
 import java.net.UnknownHostException;
-import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -27,6 +27,7 @@ import kh.mongo.MongoConnection;
 
 import com.mongodb.AggregationOutput;
 import com.mongodb.BasicDBObject;
+import com.mongodb.BasicDBObjectBuilder;
 import com.mongodb.DB;
 import com.mongodb.DBCollection;
 import com.mongodb.DBCursor;
@@ -122,29 +123,135 @@ public class SpotDataEndpoint {
 		return response;
 	}
 
+	public DBObject getAggregationQueryGroup(){
+		
+		/*
+		    {"$group": {
+		        "_id": {
+		            "$subtract": [
+		                { "$subtract": [ "$spotReceivedTimestamp", new Date("1970-01-01") ] },
+		                { "$mod": [
+		                    { "$subtract": [ "$spotReceivedTimestamp", new Date("1970-01-01") ] },
+		                    1000 * 60 * 60 * 24
+		                ]}
+		            ]
+		        },
+		        count:{$sum: 1 }
+		    }
+		}		    
+		 */
+		
+		ZonedDateTime epoch = this.parseDateStringToUTC("1970-01-01T00:00:00+00:00");
+		
+		List<DBObject> subtractList1 = new ArrayList<>();
+		
+		List<Object> subtractList2 = new ArrayList<>();
+		subtractList2.add("$spotReceivedTimestamp");
+		subtractList2.add(new Date(0));//"1970-01-01T00:00:00.000Z"
+		
+		DBObject subtractTimeStampEpochDate = new BasicDBObject("$subtract", subtractList2);
+		subtractList1.add(subtractTimeStampEpochDate);
+		
+		List<Object> modList1 = new ArrayList<>();
+		modList1.add(subtractTimeStampEpochDate);
+		modList1.add(86400000); //1000 * 60 * 60 * 24
+		DBObject mod = new BasicDBObject("$mod", modList1);
+		subtractList1.add(mod);
+		
+		DBObject query = BasicDBObjectBuilder.start()
+				.push("$group")
+				.push("_id")
+				.add("$subtract", subtractList1)
+				.pop()
+				.add("count", new BasicDBObject("$sum", 1))
+				.get();
+		return query;
+	}
+	
 	/**
 	 * Retrieves spot counts per date for Heatmap display. Groups spot counts per day.
 	 */
+	/**
+	 * @param callsign
+	 * @param fromDate
+	 * @param toDate
+	 * @return
+	 */
 	@GET
-	@Path("/heatmapCounts")
+	@Path("/heatmapCounts/{spotter}")
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response getHeatmapCountsForCallsignAndDateRange(@PathParam("callsign") String callsign,
+	public Response getHeatmapCountsForCallsignAndDateRange(@PathParam("spotter") String callsign,
 			@QueryParam("fromdate") String fromDate, @QueryParam("todate") String toDate){
 		
 		/*
 		db.Spot.aggregate(
 		[
-    		{$match: {spotter: "kk6dct"}}, 
-    		{$group: { _id : {
-        		year:{$year:"$spotReceivedTimestamp"},
-        		month:{$month:"$spotReceivedTimestamp"},
-        		day:{$dayOfMonth:"$spotReceivedTimestamp"}        
-        	},
-    		count:{$sum: 1 }
-    		}
-    		}
+		    {$match: {spotter: "kk6dct"}}, 
+		  
+		    {"$group": {
+		        "_id": {
+		            "$subtract": [
+		                { "$subtract": [ "$spotReceivedTimestamp", new Date("1970-01-01") ] },
+		                { "$mod": [
+		                    { "$subtract": [ "$spotReceivedTimestamp", new Date("1970-01-01") ] },
+		                    1000 * 60 * 60 * 24
+		                ]}
+		            ]
+		        },
+		        count:{$sum: 1 }
+		    }
+		}		    
 		])
 		*/
+		
+		/*
+		 * Expected data structure in return is:
+		 * {
+  			"946721039":1,
+  			"946706853":1,
+  			"946706340":1,
+  			...
+			}
+		 */
+		
+		/* Previous attempt:
+		 //{"$group": {
+				//"_id": {
+					//"$subtract": //// subtract1 [ //// subtractList1
+	                //{ "$subtract": //// subtract2  
+						//[ "$spotReceivedTimestamp", new Date("1970-01-01") ] }, //// subtract2list //// subtract2ListItem1
+//			List<Object> subtractList1 = new ArrayList<>();
+//			DBObject subtract2ListItem1 = new BasicDBObject("$spotReceivedTimestamp", "1970-01-01T00:00:00.000Z");
+//			List<Object> subtract2List1 = new ArrayList<>();
+//			subtract2List1.add(subtract2ListItem1);
+//			BasicDBObject subtract2 = new BasicDBObject("$subtract", subtract2List1);
+//			subtractList1.add(subtract2);
+//			BasicDBObject subtract1 = new BasicDBObject("$subtract", subtractList1);
+				 
+	                //{ "$mod": [
+	                //    { "$subtract": ////subtract3 [ ////subtract3List"$spotReceivedTimestamp", new Date("1970-01-01") ] },
+	                //    1000 * 60 * 60 * 24
+	                //]}
+//			List<Object> modList = new ArrayList<>();
+//			List<DBObject> subtract2List = new ArrayList<>();
+//			subtract2List.add(new BasicDBObject("$spotReceivedTimestamp", "1970-01-01T00:00:00.000Z"));
+//			DBObject subtract3 = new BasicDBObject("$subtract", subtract2List);
+//			modList.add(subtract3);
+//			modList.add(new Integer(1000 * 60 * 60 * 24));
+//			DBObject mod = new BasicDBObject("$mod",modList);
+//			subtractList1.add(mod);
+//			DBObject id = new BasicDBObject("_id", subtract1);
+//			BasicDBObject groupFields = new BasicDBObject("$group", id);
+			        
+					//TODO - add this back once worked out nesting
+					//count:{$sum: 1 }
+					//groupFields.append("count", new BasicDBObject("$sum", 1));
+		            //]
+		        //},
+		    //}
+		//}	
+
+		 */
 		
 		Response response = null;
 		String jsonString = null;
@@ -155,24 +262,29 @@ public class SpotDataEndpoint {
 			DB db = MongoConnection.getMongoDB();
 			DBCollection col = db.getCollection("Spot");
 
-			// $match
+			//{$match: {spotter: "callsign"}}, 
+			DBObject matchFields = new BasicDBObject("$match", 
+					new BasicDBObject("spotter", callsign));
+		    
+			//get $group
+			DBObject groupFields = this.getAggregationQueryGroup();
 			
-			//TODO
+			//TODO: need to append date range
 			
-			// $group
+			//debug
+			String match = JSON.serialize(matchFields);
+			System.out.println(match);		
+			String group = JSON.serialize(groupFields);
+			System.out.println(group);		
+					
+			List<DBObject> pipeline  = new ArrayList<>();
 			
-			//TODO
-			
-			DBObject groupFields = new BasicDBObject("_id", "$spotter");
-			groupFields.put("firstSpot", new BasicDBObject("$min", "$spotReceivedTimestamp"));
-			groupFields.put("lastSpot", new BasicDBObject("$max", "$spotReceivedTimestamp"));
-			groupFields.put("totalSpots", new BasicDBObject("$sum", 1));
-			DBObject group = new BasicDBObject("$group", groupFields);
-
-			List<DBObject> pipeline = Arrays.asList(group);
+			pipeline.add(matchFields);
+			pipeline.add(groupFields);
 
 			AggregationOutput output = col.aggregate(pipeline);
-			jsonResult.append("{ \"topUploads\" : [ ");
+			//TODO should data returned include pagination details
+			jsonResult.append("{ \"heatmapCounts\" : [ ");
 			boolean firstResult = true;
 			for (DBObject result : output.results()) {
 				if(firstResult){
@@ -184,7 +296,7 @@ public class SpotDataEndpoint {
 				jsonString = JSON.serialize(result);
 				jsonResult.append(jsonString);
 			}
-			jsonResult.append("] }");
+			jsonResult.append(" ] }");
 			if (jsonString == null) {
 				jsonString = "{}";
 			}

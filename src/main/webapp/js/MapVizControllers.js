@@ -60,6 +60,10 @@ spotVizControllers.controller('SpotVizController', ['$scope', '$http', '$filter'
         //TODO what is this used for?
         $scope.search.date = moment();
         
+        //heatmap config
+        $scope.search.heatmap = {};
+        $scope.search.heatmap.config = {};
+        
         //playback controls
         var runningCounter = null;
         //initial empty array for map marker positions
@@ -205,7 +209,7 @@ spotVizControllers.controller('SpotVizController', ['$scope', '$http', '$filter'
             $scope.search.selectedEndDateTime = formattedToDate + "T" + toTimeOnly + "Z";
 
 
-            url = "/spotviz/spotdata/spots/" + $scope.search.callsign
+            var url = "/spotviz/spotdata/spots/" + $scope.search.callsign
                     + "?fromdate=" + $scope.search.selectedStartDateTime
                     + "&todate=" + $scope.search.selectedEndDateTime;
 
@@ -223,24 +227,60 @@ spotVizControllers.controller('SpotVizController', ['$scope', '$http', '$filter'
                             + "end date: " + formattedToDate + " " + toTimeOnly + " UTC "
                             + "Spots for selected date range: " + data.length;
                     $scope.search.spots = data;
-                    
-                    //heatmap
+                }
+            }).error(function (data) {
+            	console.log(data);
+            	//TODO: msg is not currently displayed on page?
+                $scope.msg = "Failed to retrieve spot summary data at this time. Try later?";
+            });
+            
+          //build heatmap options
+            url = "/spotviz/spotdata/heatmapCounts/" + $scope.search.callsign;
+            //TODO: add date range
+            //+ "?fromdate=" + $scope.search.selectedStartDateTime
+            //+ "&todate=" + $scope.search.selectedEndDateTime;
+            
+            //retrive and parse heatmap counts 
+            $http.get(url).success(function (heatmapData) {
+                if (heatmapData == {}) {
+                	$scope.search.showDataDensity = false;
+                }
+                else{
                     $scope.search.heatmap = {};
                     $scope.search.heatmap.config = {
                         domain: "month",
-                        start: new Date(2015, 4, 1)
+                        legend : [10,20,30,40,50], //angular-cal-heatmap default: [2,4,6,8,10],
+                        range: 6, ////angular-cal-heatmap default: 3
+                        //TODO: this needs to be based on the retrieved data?
+                        start: new Date(2014, 6, 1)
                     };
                     
+                    //reformat data to expected format for Cal-HeatMap
+                    //TODO: can this processing be moved to the endpoint?
+                    var parser = function(data) {
+                    	var stats = {};
+                    	for (var i in data.heatmapCounts) {
+                    		var ts = data.heatmapCounts[i]._id / 1000; 
+                    		stats[ts] = data.heatmapCounts[i].count;
+                    	}
+                    	return stats;
+                    };
+                    heatmapData = parser(heatmapData);
+                    $scope.search.heatmap.config.data = heatmapData;
+                    
+                    //afterLoadData not suppported by directive?
+                    //$scope.search.heatmap.config.afterLoadData = parser;
+                    //toggle flag for ng-if display
                     $scope.search.showDataDensity = true;
                 }
-            }).error(function (data) {
-                $scope.msg = "Failed to retrieve data at this time. Try later?";
+        	}).error(function (heatmapData) {
+            	console.log(heatmapData);
+            	//TODO: msg is not currently displayed on page?
+                $scope.msg = "Failed to retrieve heatmap data at this time. Try later?";
             });
+            
         }
 
-        //
-        //TODO: need to degub the playback, not working
-        //
         
         //Start the playback
         $scope.start = function () {

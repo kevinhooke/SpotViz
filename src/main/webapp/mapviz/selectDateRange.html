@@ -90,7 +90,8 @@
 </div>
 <div class="row" ng-show="search.showDataDensity">
     <div class="col-md-12">
-        <cal-heatmap config="search.heatmap.config"></cal-heatmap>
+        <cal-heatmap ng-if="search.showDataDensity" config="search.heatmap.config"></cal-heatmap>
+        
     </div>
 
 </div>
