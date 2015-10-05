@@ -410,11 +410,14 @@ public class SpotDataEndpoint {
 							new BasicDBObject("$gte", Date.from(fromDateParsed.toInstant())));
 
 					// retrieve up to pageSize
-					c = col.find(query).sort(new BasicDBObject("spotReceivedTimestamp", 1)).limit(pageSize);
+                    c = col.find(query).limit(pageSize);
+					//c = col.find(query).sort(new BasicDBObject("spotReceivedTimestamp", 1)).limit(pageSize);
 					jsonString = JSON.serialize(c);
 				}
 
-				response = Response.status(Status.OK).entity(jsonString).build();
+				response = Response.status(Status.OK)
+                                        .header("Access-Control-Allow-Origin", "*")
+                                        .entity(jsonString).build();
 			} catch (DateTimeParseException dtpe) {
 				dtpe.printStackTrace();
 				response = Response.status(Status.INTERNAL_SERVER_ERROR)
