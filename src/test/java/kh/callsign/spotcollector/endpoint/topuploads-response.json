@@ -1,0 +1,24 @@
+{
+  "topUploads": [
+    {
+      "_id": "test",
+      "firstSpot": {
+        "$date": "2014-01-01T20:01:00.000Z"
+      },
+      "lastSpot": {
+        "$date": "2014-01-02T04:20:00.000Z"
+      },
+      "totalSpots": 500
+    },
+    {
+      "_id": "kk6dct",
+      "firstSpot": {
+        "$date": "2014-07-07T19:50:00.000Z"
+      },
+      "lastSpot": {
+        "$date": "2015-02-27T07:12:00.000Z"
+      },
+      "totalSpots": 2319
+    }
+  ]
+}

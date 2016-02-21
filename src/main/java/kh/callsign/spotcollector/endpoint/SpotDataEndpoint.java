@@ -386,7 +386,9 @@ public class SpotDataEndpoint {
 	@Path("/pagedspots/{callsign}")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getPaginatedSpotsForCallsignFromDate(@PathParam("callsign") String callsign,
-			@QueryParam("fromdate") String fromDate, @DefaultValue("10") @QueryParam("pageSize") int pageSize) {
+			@QueryParam("fromdate") String fromDate,
+			@QueryParam("direction") @DefaultValue("next") String direction,
+			@DefaultValue("10") @QueryParam("pageSize") int pageSize) {
 		Response response = null;
 		
 		try {
@@ -401,17 +403,15 @@ public class SpotDataEndpoint {
 				if (fromDate != null) {
 					fromDateParsed = parseDateStringToUTC(fromDate);
 
-					// start building result doc
-					JsonObjectBuilder builder = Json.createObjectBuilder();
-					JsonArrayBuilder spotsPerIntervalBuilder = Json.createArrayBuilder();
 					BasicDBObject query = new BasicDBObject("spotter", callsign);
 					query.append(
 							"spotReceivedTimestamp",
-							new BasicDBObject("$gte", Date.from(fromDateParsed.toInstant())));
+							//new BasicDBObject(getPaginationQueryCondition(direction),
+							new BasicDBObject("$gte",
+									Date.from(fromDateParsed.toInstant())));
 
 					// retrieve up to pageSize
-                    c = col.find(query).limit(pageSize);
-					//c = col.find(query).sort(new BasicDBObject("spotReceivedTimestamp", 1)).limit(pageSize);
+					c = col.find(query).sort(new BasicDBObject("spotReceivedTimestamp", 1)).limit(pageSize);
 					jsonString = JSON.serialize(c);
 				}
 
@@ -428,6 +428,17 @@ public class SpotDataEndpoint {
 					.entity("Error connecting to MongoDB").build();
 		}
 		return response;
+	}
+
+	private String getPaginationQueryCondition(String direction) {
+		String condition = null;
+		if(direction.equals("next")){
+			condition = "$gte";
+		}
+		else{
+			condition = "$lte";
+		}
+		return condition;
 	}
 
 	private String retrieveSinglePage(String spotterCallsign, ZonedDateTime startDateCurrentPage,

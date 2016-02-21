@@ -42,6 +42,19 @@ var spotVizApp = angular.module('SpotVizApp', [ "ui.router", "ngAnimate",
             templateUrl: 'howToUpload.html'
         })
 
+        //show searchTopUploaders
+        .state('searchTopUploaders', {
+            url: '/searchTopUploaders',
+            templateUrl: 'searchTopUploaders.html'
+        })
+
+        //show searchUploadsByCallsign
+        .state('searchUploadsByCallsign', {
+            url: '/searchUploadsByCallsign',
+            templateUrl: 'searchUploadsByCallsign.html'
+        })
+
+        
         //show FAQ
         .state('faq', {
             url: '/faq',
