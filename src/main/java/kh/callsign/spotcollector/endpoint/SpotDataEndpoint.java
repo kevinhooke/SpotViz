@@ -84,8 +84,6 @@ public class SpotDataEndpoint {
 		String jsonString = null;
 		StringBuilder jsonResult = new StringBuilder();
 		try {
-
-			DBCursor c = null;
 			DB db = MongoConnection.getMongoDB();
 			DBCollection col = db.getCollection("Spot");
 
@@ -96,7 +94,9 @@ public class SpotDataEndpoint {
 			groupFields.put("totalSpots", new BasicDBObject("$sum", 1));
 			DBObject group = new BasicDBObject("$group", groupFields);
 
-			List<DBObject> pipeline = Arrays.asList(group);
+			List<DBObject> pipeline = Arrays.asList(group,
+					new BasicDBObject("$sort", new BasicDBObject("totalSpots", -1)) 
+					);
 
 			AggregationOutput output = col.aggregate(pipeline);
 			jsonResult.append("{ \"topUploads\" : [ ");

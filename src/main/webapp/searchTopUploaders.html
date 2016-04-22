@@ -5,7 +5,25 @@
 		</div>
 	</div>
 
-	<div class="row">
+	<div class="row" ng-Controller="SpotDataController" data-ng-init="init()">
+	
 		<div class="col-md-12">
+		
+		<table class="table">
+		<thead>
+			<th>Callsign</th>
+			<th>First Spot</th>
+			<th>Last Spot</th>
+			<th>Spots Uploaded</th>
+		</thead>
+		<tr scope="row" ng-repeat="uploader in spotdata.data.topUploads">
+			<td>{{uploader._id}}</td>
+			<td>{{uploader.firstSpot.$date}}</td>
+			<td>{{uploader.lastSpot.$date}}</td>
+			<td>{{uploader.totalSpots}}</td>
+		</tr>
+		
+		</table>
+		
 		</div>
 	</div>

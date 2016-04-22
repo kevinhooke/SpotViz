@@ -197,9 +197,9 @@ var ngMap = angular.module('ngMap', []);
         var matches = attrValue.match(/([^\(]+)\(([^\)]*)\)/);
         var funcName = matches[1];
         var argsStr = matches[2].replace(/event[ ,]*/,'');  //remove string 'event'
-        
-        var args = scope.$eval("["+argsStr+"]");
+        var argsExpr = $parse("["+argsStr+"]"); //for perf when triggering event
         return function(event) {
+          var args = argsExpr(scope); //get args here to pass updated model values
           function index(obj,i) {return obj[i];}
           var f = funcName.split('.').reduce(index, scope);
           f && f.apply(this, [event].concat(args));
@@ -568,6 +568,7 @@ ngMap.directive('cloudLayer', ['Attr2Options', function(Attr2Options) {
 }]);
 
 /*jshint -W030*/
+/* global google, ngMap */
 /**
  * @ngdoc directive
  * @name custom-control
@@ -597,13 +598,13 @@ ngMap.directive('cloudLayer', ['Attr2Options', function(Attr2Options) {
  */
 /*jshint -W089*/
 ngMap.directive('customControl', ['Attr2Options', '$compile', function(Attr2Options, $compile)  {
+  'use strict';
   var parser = Attr2Options;
 
   return {
     restrict: 'E',
     require: '^map',
     link: function(scope, element, attrs, mapController) {
-      element.css('display','none');
       var orgAttrs = parser.orgAttributes(element);
       var filtered = parser.filter(attrs);
       var options = parser.getOptions(filtered, scope);
@@ -613,8 +614,8 @@ ngMap.directive('customControl', ['Attr2Options', '$compile', function(Attr2Opti
       /**
        * build a custom control element
        */
-      var compiled = $compile(element.html().trim())(scope);
-      var customControlEl = compiled[0];
+      var customControlEl = element[0].parentElement.removeChild(element[0]);
+      $compile(customControlEl.innerHTML.trim())(scope);
 
       /**
        * set events
@@ -953,12 +954,12 @@ ngMap.directive('heatmapLayer', ['Attr2Options', '$window', function(Attr2Option
 
 /**
  * @ngdoc directive
- * @name info-window 
- * @requires Attr2Options 
+ * @name info-window
+ * @requires Attr2Options
  * @requires $compile
- * @description 
+ * @description
  *   Defines infoWindow and provides compile method
- *   
+ *
  *   Requires:  map directive
  *
  *   Restrict To:  Element
@@ -967,15 +968,15 @@ ngMap.directive('heatmapLayer', ['Attr2Options', '$window', function(Attr2Option
  * @param {Boolean} visible-on-marker Indicates to show it on a marker when map is initialized
  * @param {Expression} geo-callback if position is an address, the expression is will be performed when geo-lookup is successful. e.g., geo-callback="showDetail()"
  * @param {String} &lt;InfoWindowOption> Any InfoWindow options,
- *        https://developers.google.com/maps/documentation/javascript/reference?csw=1#InfoWindowOptions  
+ *        https://developers.google.com/maps/documentation/javascript/reference?csw=1#InfoWindowOptions
  * @param {String} &lt;InfoWindowEvent> Any InfoWindow events, https://developers.google.com/maps/documentation/javascript/reference
  * @example
- * Usage: 
+ * Usage:
  *   <map MAP_ATTRIBUTES>
  *    <info-window id="foo" ANY_OPTIONS ANY_EVENTS"></info-window>
  *   </map>
  *
- * Example: 
+ * Example:
  *  <map center="41.850033,-87.6500523" zoom="3">
  *    <info-window id="1" position="41.850033,-87.6500523" >
  *      <div ng-non-bindable>
@@ -992,132 +993,130 @@ ngMap.directive('heatmapLayer', ['Attr2Options', '$window', function(Attr2Option
 (function() {
   'use strict';
 
-   var infoWindow = function(Attr2Options, $compile, $timeout, $parse)  {
-     var parser = Attr2Options;
+  var infoWindow = function(Attr2Options, $compile, $timeout, $parse)  {
+    var parser = Attr2Options;
 
-     var getInfoWindow = function(options, events, element) {
-       var infoWindow;
+    var getInfoWindow = function(options, events, element) {
+      var infoWindow;
 
-       /**
-        * set options
-        */
-       if (options.position && !(options.position instanceof google.maps.LatLng)) {
-         delete options.position;
-       }
-       infoWindow = new google.maps.InfoWindow(options);
+      /**
+       * set options
+       */
+      if (options.position && !(options.position instanceof google.maps.LatLng)) {
+        delete options.position;
+      }
+      infoWindow = new google.maps.InfoWindow(options);
 
-       /**
-        * set events
-        */
-       if (Object.keys(events).length > 0) {
-         console.log("infoWindow events", events);
-       }
-       for (var eventName in events) {
-         if (eventName) {
-           google.maps.event.addListener(infoWindow, eventName, events[eventName]);
-         }
-       }
+      /**
+       * set events
+       */
+      if (Object.keys(events).length > 0) {
+        console.log("infoWindow events", events);
+      }
+      for (var eventName in events) {
+        if (eventName) {
+          google.maps.event.addListener(infoWindow, eventName, events[eventName]);
+        }
+      }
 
-       /**
-        * set template ane template-relate functions
-        * it must have a container element with ng-non-bindable
-        */
-       var template = element.html().trim();
-       if (angular.element(template).length != 1) {
-         throw "info-window working as a template must have a container";
-       }
-       infoWindow.__template = template.replace(/\s?ng-non-bindable[='"]+/,"");
+      /**
+       * set template ane template-relate functions
+       * it must have a container element with ng-non-bindable
+       */
+      var template = element.html().trim();
+      if (angular.element(template).length != 1) {
+        throw "info-window working as a template must have a container";
+      }
+      infoWindow.__template = template.replace(/\s?ng-non-bindable[='"]+/,"");
 
-       infoWindow.__compile = function(scope, anchor) {
-         anchor && (scope['this'] = anchor);
-         var el = $compile(infoWindow.__template)(scope);
-         infoWindow.setContent(el[0]);
-         scope.$apply();
-       };
+      infoWindow.__compile = function(scope, anchor) {
+        anchor && (scope['this'] = anchor);
+        var el = $compile(infoWindow.__template)(scope);
+        infoWindow.setContent(el[0]);
+        scope.$apply();
+      };
 
-       infoWindow.__open = function(map, scope, anchor) {
-         $timeout(function() {
-           var tempTemplate = infoWindow.__template; // set template in a temporary variable
-           infoWindow.__compile(scope, anchor);
-           if (anchor && anchor.getPosition) {
-             infoWindow.open(map, anchor);
-           } else if (anchor && anchor instanceof google.maps.LatLng) {
-             infoWindow.open(map);
-             infoWindow.setPosition(anchor);
-           } else {
-             infoWindow.open(map);
-           }
-           infoWindow.__template = tempTemplate; // reset template to the object
-         });
-       };
+      infoWindow.__open = function(map, scope, anchor) {
+        $timeout(function() {
+          infoWindow.__compile(scope, anchor);
+          if (anchor && anchor.getPosition) {
+            infoWindow.open(map, anchor);
+          } else if (anchor && anchor instanceof google.maps.LatLng) {
+            infoWindow.open(map);
+            infoWindow.setPosition(anchor);
+          } else {
+            infoWindow.open(map);
+          }
+        });
+      };
 
-       return infoWindow;
-     };
+      return infoWindow;
+    };
 
-     var linkFunc = function(scope, element, attrs, mapController) {
-       element.css('display','none');
-       var orgAttrs = parser.orgAttributes(element);
-       var filtered = parser.filter(attrs);
-       var options = parser.getOptions(filtered, scope);
-       var events = parser.getEvents(scope, filtered);
-       console.log('infoWindow', 'options', options, 'events', events);
+    var linkFunc = function(scope, element, attrs, mapController) {
+      element.css('display','none');
+      var orgAttrs = parser.orgAttributes(element);
+      var filtered = parser.filter(attrs);
+      var options = parser.getOptions(filtered, scope);
+      var events = parser.getEvents(scope, filtered);
+      console.log('infoWindow', 'options', options, 'events', events);
 
-       var address;
-       if (options.position && !(options.position instanceof google.maps.LatLng)) {
-         address = options.position;
-       }
-       var infoWindow = getInfoWindow(options, events, element);
-       if (address) {
-         mapController.getGeoLocation(address).then(function(latlng) {
-           infoWindow.setPosition(latlng);
-           infoWindow.__open(mapController.map, scope, latlng);
-           var geoCallback = attrs.geoCallback;
-           geoCallback && $parse(geoCallback)(scope);
-         });
-       }
+      var address;
+      if (options.position && !(options.position instanceof google.maps.LatLng)) {
+        address = options.position;
+      }
+      var infoWindow = getInfoWindow(options, events, element);
+      if (address) {
+        mapController.getGeoLocation(address).then(function(latlng) {
+          infoWindow.setPosition(latlng);
+          infoWindow.__open(mapController.map, scope, latlng);
+          var geoCallback = attrs.geoCallback;
+          geoCallback && $parse(geoCallback)(scope);
+        });
+      }
 
-       mapController.addObject('infoWindows', infoWindow);
-       mapController.observeAttrSetObj(orgAttrs, attrs, infoWindow); /* observers */
+      mapController.addObject('infoWindows', infoWindow);
+      mapController.observeAttrSetObj(orgAttrs, attrs, infoWindow); /* observers */
 
-       scope.$on('mapInitialized', function(evt, map) {
-         infoWindow.visible && infoWindow.__open(map, scope);
-         if (infoWindow.visibleOnMarker) {
-           var markerId = infoWindow.visibleOnMarker;
-           infoWindow.__open(map, scope, map.markers[markerId]);
-         }
-       });
+      scope.$on('mapInitialized', function(evt, map) {
+        infoWindow.visible && infoWindow.__open(map, scope);
+        if (infoWindow.visibleOnMarker) {
+          var markerId = infoWindow.visibleOnMarker;
+          infoWindow.__open(map, scope, map.markers[markerId]);
+        }
+      });
 
-       /**
-        * provide showInfoWindow method to scope
-        */
+      /**
+       * provide showInfoWindow method to scope
+       */
 
-       scope.showInfoWindow  = function(e, id, marker) {
-         var infoWindow = mapController.map.infoWindows[id];
-         var anchor = marker ? marker : (this.getPosition ? this : null);
-         infoWindow.__open(mapController.map, scope, anchor);
-       };
+      scope.showInfoWindow  = function(e, id, marker) {
+        var infoWindow = mapController.map.infoWindows[id];
+        var anchor = marker ? marker : (this.getPosition ? this : null);
+        infoWindow.__open(mapController.map, scope, anchor);
+      };
 
-       /**
-        * provide hideInfoWindow method to scope
-        */
-       scope.hideInfoWindow  = scope.hideInfoWindow ||
-         function(event, id) {
-           var infoWindow = mapController.map.infoWindows[id];
-           infoWindow.close();
-         };
+      /**
+       * provide hideInfoWindow method to scope
+       */
+      scope.hideInfoWindow  = scope.hideInfoWindow ||
+        function(event, id) {
+          var infoWindow = mapController.map.infoWindows[id];
+          infoWindow.close();
+        };
 
-     }; //link
+    }; //link
 
-     return {
-       restrict: 'E',
-       require: '^map',
-       link: linkFunc
-     }; 
+    return {
+      restrict: 'E',
+      require: '^map',
+      link: linkFunc
+    };
 
-   }; // infoWindow
-   infoWindow.$inject = ['Attr2Options', '$compile', '$timeout', '$parse'];
+  }; // infoWindow
+  infoWindow.$inject = ['Attr2Options', '$compile', '$timeout', '$parse'];
 
-   angular.module('ngMap').directive('infoWindow', infoWindow); 
+  angular.module('ngMap').directive('infoWindow', infoWindow);
 })();
 
 /**
@@ -1431,6 +1430,14 @@ ngMap.directive('mapType', ['Attr2Options', '$window', function(Attr2Options, $w
       if (getStyle(element[0], 'height').match(/^(0|auto)/)) {
         element.css('height','300px');
       }
+
+      /**
+       * disable drag event
+       */
+      element[0].addEventListener('dragstart', function(event) {
+        event.preventDefault();
+        return false;
+      });
 
       /**
        * initialize function
