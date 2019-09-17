@@ -251,8 +251,7 @@ spotVizControllers.controller('SpotVizController', ['$scope', '$http', '$filter'
                         domain: "month",
                         legend : [10,20,30,40,50], //angular-cal-heatmap default: [2,4,6,8,10],
                         range: 6, ////angular-cal-heatmap default: 3
-                        //TODO: this needs to be based on the retrieved data?
-                        start: new Date(2014, 6, 1)
+                        start: $scope.search.fromDate
                     };
                     
                     //reformat data to expected format for Cal-HeatMap
