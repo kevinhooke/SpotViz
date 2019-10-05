@@ -8,6 +8,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 
 import javax.enterprise.context.RequestScoped;
@@ -24,8 +25,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
-import kh.mongo.MongoConnection;
-
+import com.mongodb.AggregationOptions;
 import com.mongodb.AggregationOutput;
 import com.mongodb.BasicDBObject;
 import com.mongodb.BasicDBObjectBuilder;
@@ -34,6 +34,8 @@ import com.mongodb.DBCollection;
 import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
 import com.mongodb.util.JSON;
+
+import kh.mongo.MongoConnection;
 
 @RequestScoped
 @Path("/spotdata")
@@ -98,16 +100,23 @@ public class SpotDataEndpoint {
 					new BasicDBObject("$sort", new BasicDBObject("totalSpots", -1)) 
 					);
 
-			AggregationOutput output = col.aggregate(pipeline);
+			//TODO test this and copy approach to other aggregation queries
+			AggregationOptions aggregationOptions = AggregationOptions.builder()
+					.outputMode(AggregationOptions.OutputMode.CURSOR).build();
+			
+			//AggregationOutput output = col.aggregate(pipeline);
+			Iterator<DBObject> cursor =  col.aggregate(pipeline, aggregationOptions);
 			jsonResult.append("{ \"topUploads\" : [ ");
 			boolean firstResult = true;
-			for (DBObject result : output.results()) {
+			//for (DBObject result : output.results()) {
+			while(cursor.hasNext()) {
+				DBObject next = cursor.next();
 				if (firstResult) {
 					firstResult = false;
 				} else {
 					jsonResult.append(", ");
 				}
-				jsonString = JSON.serialize(result);
+				jsonString = JSON.serialize(next);
 				jsonResult.append(jsonString);
 			}
 			jsonResult.append("] }");
@@ -248,18 +257,25 @@ public class SpotDataEndpoint {
 
 			pipeline.add(matchFields);
 			pipeline.add(groupFields);
-
-			AggregationOutput output = col.aggregate(pipeline);
+			//TODO test this and copy approach to other aggregation queries
+			AggregationOptions aggregationOptions = AggregationOptions.builder()
+					.outputMode(AggregationOptions.OutputMode.CURSOR).build();
+			//AggregationOutput output = col.aggregate(pipeline);
+			Iterator<DBObject> cursor =  col.aggregate(pipeline, aggregationOptions);
+			
+			//AggregationOutput output = col.aggregate(pipeline);
 			// TODO should data returned include pagination details
 			jsonResult.append("{ \"heatmapCounts\" : [ ");
 			boolean firstResult = true;
-			for (DBObject result : output.results()) {
+			//for (DBObject result : output.results()) {
+			while(cursor.hasNext()) {
+				DBObject next = cursor.next();
 				if (firstResult) {
 					firstResult = false;
 				} else {
 					jsonResult.append(", ");
 				}
-				jsonString = JSON.serialize(result);
+				jsonString = JSON.serialize(next);
 				jsonResult.append(jsonString);
 			}
 			jsonResult.append(" ] }");
@@ -296,7 +312,7 @@ public class SpotDataEndpoint {
 	@GET
 	@Path("/spots/{callsign}")
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response getSpotsForCallsignBetweenDateRane(@PathParam("callsign") String callsign,
+	public Response getSpotsForCallsignBetweenDateRange(@PathParam("callsign") String callsign,
 			@QueryParam("fromdate") String fromDate, @QueryParam("todate") String toDate,
 			@QueryParam("interval") int interval, @QueryParam("flatpages") Boolean flatPages) {
 		Response response = null;
@@ -449,8 +465,8 @@ public class SpotDataEndpoint {
 		query.append("spotReceivedTimestamp",
 				new BasicDBObject("$gte", Date.from(startDateCurrentPage.toInstant())).append(
 						"$lt", Date.from(endDateCurrentPage.toInstant())));
-		// max 200 spots per interval
-		c = col.find(query).sort(new BasicDBObject("spotReceivedTimestamp", 1)).limit(200);
+		// max 2000 spots per interval
+		c = col.find(query).sort(new BasicDBObject("spotReceivedTimestamp", 1)).limit(6000);
 
 		jsonString = JSON.serialize(c);
 		return jsonString;
@@ -503,11 +519,15 @@ public class SpotDataEndpoint {
 		DBObject group = new BasicDBObject("$group", groupFields);
 
 		List<DBObject> pipeline = Arrays.asList(match, group);
-
-		AggregationOutput output = col.aggregate(pipeline);
-		for (DBObject result : output.results()) {
-			jsonResult = JSON.serialize(result);
-			break;
+		
+		//TODO test this and copy approach to other aggregation queries
+		AggregationOptions aggregationOptions = AggregationOptions.builder()
+				.outputMode(AggregationOptions.OutputMode.CURSOR).build();
+		//AggregationOutput output = col.aggregate(pipeline);
+		Iterator<DBObject> cursor =  col.aggregate(pipeline, aggregationOptions);
+		while(cursor.hasNext()) {
+			DBObject next = cursor.next();
+			jsonResult = JSON.serialize(next);
 		}
 		if (jsonResult == null) {
 			jsonResult = "{}";
