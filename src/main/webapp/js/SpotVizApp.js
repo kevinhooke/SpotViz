@@ -18,7 +18,7 @@ var spotVizApp = angular.module('SpotVizApp', [ "ui.router", "ngAnimate",
             controller: 'SpotVizController'
         })
 
-        //visualization calsign selection
+        //visualization callsign selection
         .state('visualize.selectCallsign', {
             url: '/callsign',
             templateUrl: 'mapviz/selectCallsign.html'

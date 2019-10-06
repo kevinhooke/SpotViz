@@ -75,6 +75,11 @@
             <div class="panel-heading">
                 <h3 class="panel-title">Distribution of data for selected date range</h3>
             </div>
+            <div class="row" ng-show="search.showDataDensity">
+    			<div class="col-md-12">
+        			<cal-heatmap ng-if="search.showDataDensity" config="search.heatmap.config"></cal-heatmap>        
+    			</div>
+			</div>
             <div class="panel-body">
                 <p>(TODO: in progress) This chart shows the availability of the uploaded data between your chosen dates. Darker colors indicate
                     where there is more data available to visualize. If there are many periods with no data available it
@@ -87,11 +92,4 @@
             </div>
         </div>
     </div>
-</div>
-<div class="row" ng-show="search.showDataDensity">
-    <div class="col-md-12">
-        <cal-heatmap ng-if="search.showDataDensity" config="search.heatmap.config"></cal-heatmap>
-        
-    </div>
-
 </div>

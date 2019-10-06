@@ -129,12 +129,16 @@ spotVizControllers.controller('SpotVizController', ['$scope', '$http', '$filter'
                         //picker is in correct format
                         $scope.search.msg = '';
                         $scope.search.numberOfSpots = data.totalSpots;
+                        
+                        var firstSpotDate = data.firstSpot.$date;
                         $scope.search.dateFirstSpot = data.firstSpot.$date;
-                        //$scope.fromDate = moment($scope.dateFirstSpot).format("mm/DD/YYYY").toDate();
-                        $scope.search.fromDate = $scope.search.dateFirstSpot;
-
-                        lastSpotDate = moment(data.lastSpot.$date).add(1, 'days').toDate();
+                        $scope.fromDate = moment(firstSpotDate).toDate();
+                        $scope.search.fromDate = $scope.fromDate
+                        $scope.search.fromTime = $scope.fromDate;
+                        
+                        var lastSpotDate = moment(data.lastSpot.$date).add(1, 'days').toDate();
                         $scope.search.toDate = lastSpotDate;
+                        $scope.search.toTime = lastSpotDate;
                         $scope.search.fromDateOptions = {
                             minDate: new Date(data.firstSpot.$date),
                             maxDate: lastSpotDate
@@ -201,6 +205,10 @@ spotVizControllers.controller('SpotVizController', ['$scope', '$http', '$filter'
          * Retrieves spots for given callsign and date range.
          */
         $scope.retrieve = function () {
+        	
+        	//set heatmap display back to false to force to redraw if there is data for range
+        	$scope.search.showDataDensity = false;
+        	
             var fromTimeOnly = moment($scope.search.fromTime).format("HH:mm:ss");
             var toTimeOnly = moment($scope.search.toTime).format("HH:mm:ss");
             var formattedFromDate = moment($scope.search.fromDate).format("YYYY-MM-DD");
@@ -249,7 +257,7 @@ spotVizControllers.controller('SpotVizController', ['$scope', '$http', '$filter'
                     $scope.search.heatmap = {};
                     $scope.search.heatmap.config = {
                         domain: "month",
-                        legend : [10,20,30,40,50], //angular-cal-heatmap default: [2,4,6,8,10],
+                        legend : [10,100,2000,4000,6000], //angular-cal-heatmap default: [2,4,6,8,10],
                         range: 6, ////angular-cal-heatmap default: 3
                         start: $scope.search.fromDate
                     };
