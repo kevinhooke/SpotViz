@@ -1,3 +1,11 @@
+<script type="text/ng-template" id="perDateStatsTemplate">
+    <h1>Spot Data for day {{ search.heatmap.clickedDateFormatted }}</h1>
+	<p>Clicked ts: {{ search.heatmap.clickedDate }}</p>
+    <p>First spot received at: {{ search.heatmap.rawdata[search.heatmap.clickedDate/1000].firstSpot }}</p>
+    <p>First spot received at: {{ search.heatmap.rawdata[search.heatmap.clickedDate/1000].LastSpot }}</p>
+	<p>Spot count total for day: {{ search.heatmap.rawdata[search.heatmap.clickedDate/1000].count }}
+</script>
+
 <div class="row">
 
     <div class="col-md-6">
@@ -68,6 +76,7 @@
     </div>
 </div>
 
+<!--  cal-heatmap -->
 <div class="row">
     <div class="col-md-12">
         <div class="panel panel-default fadeInHideShow"
@@ -77,7 +86,8 @@
             </div>
             <div class="row" ng-show="search.showDataDensity">
     			<div class="col-md-12">
-        			<cal-heatmap ng-if="search.showDataDensity" config="search.heatmap.config"></cal-heatmap>        
+        			<cal-heatmap ng-if="search.showDataDensity" config="search.heatmap.config" 
+        				ng-click="showStatsForDate($event)"></cal-heatmap>        
     			</div>
 			</div>
             <div class="panel-body">

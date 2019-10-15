@@ -17,27 +17,57 @@ spotDataControllers.controller('SpotDataController', ['$scope', '$http', '$filte
 		console.log("ctrl init");
 		
 		var url = "/spotviz/spotdata/topUploads";
-        $http.get(url).success(function (data) {
-            console.log('data: ' + data);
-            $scope.spotdata.data = data;
-        });
+//        $http.get(url).success(function (data) {
+//            console.log('data: ' + data);
+//            $scope.spotdata.data = data;
+//        });
+        
+        $http({
+            method: 'GET',
+            url: url
+         }).then(function (response){
+        	 var data = response.data;
+        	 console.log('data: ' + data);
+             $scope.spotdata.data = data;
+         }, function (error){
+
+         });
 	}
 	
 	$scope.retrieveSpotDataForCallsign = function(){
 		var url = "/spotviz/spotdata/spots/" + $scope.datasearch.callsign;
 		
-        $http.get(url).success(function (data) {
-            console.log('data: ' + data);
-            if(data._id){
-            	$scope.spotdataForCallsign.data = data;
-            	$scope.spotdataForCallsign.noDataMsg = "";
-            }
-            else{
-            	$scope.spotdataForCallsign.data = {};
-            	$scope.spotdataForCallsign.noDataMsg = "No data available for callsign: "
-            		+ $scope.datasearch.callsign;
-            }
-        });
+//        $http.get(url).success(function (data) {
+//            console.log('data: ' + data);
+//            if(data._id){
+//            	$scope.spotdataForCallsign.data = data;
+//            	$scope.spotdataForCallsign.noDataMsg = "";
+//            }
+//            else{
+//            	$scope.spotdataForCallsign.data = {};
+//            	$scope.spotdataForCallsign.noDataMsg = "No data available for callsign: "
+//            		+ $scope.datasearch.callsign;
+//            }
+//        });
+        
+        $http({
+            method: 'GET',
+            url: url
+         }).then(function (response){
+        	 var data = response.data;
+        	 console.log('data: ' + data);
+             if(data._id){
+             	$scope.spotdataForCallsign.data = data;
+             	$scope.spotdataForCallsign.noDataMsg = "";
+             }
+             else{
+             	$scope.spotdataForCallsign.data = {};
+             	$scope.spotdataForCallsign.noDataMsg = "No data available for callsign: "
+             		+ $scope.datasearch.callsign;
+             }
+         }, function (error){
+
+         });
 	}
 
 }]);

@@ -1,4 +1,4 @@
-var spotVizControllers = angular.module('SpotVizControllers', ["ngAnimate"]);
+var spotVizControllers = angular.module('SpotVizControllers', ['ngAnimate', 'ngSanitize']);
 
 spotVizControllers.filter('spotIntervalFilter', function () {
 
@@ -26,9 +26,13 @@ spotVizControllers.filter('spotIntervalFilter', function () {
 
 });
 
+spotVizControllers.controller('uiLeafletController', function ($scope) {
+	//
+});
+
 spotVizControllers.controller('SpotVizController', ['$scope', '$http', '$filter', '$interval',
-    '$state',
-    function ($scope, $http, $filter, $interval, $state) {
+    '$state', 'ngDialog', 
+    function ($scope, $http, $filter, $interval, $state, ngDialog) {
 
         //set focus on callsign field
         angular.element('#callsign').trigger('focus');
@@ -83,6 +87,7 @@ spotVizControllers.controller('SpotVizController', ['$scope', '$http', '$filter'
         $scope.playbackControls.currentValue = 1;
         $scope.playbackControls.currentInterval = 0;
 
+        //$scope.uileafletaccessor.invalidateSize();
 
         /*
          * Creates array of markers from data for the currently playing interval.
@@ -99,9 +104,21 @@ spotVizControllers.controller('SpotVizController', ['$scope', '$http', '$filter'
             else{
                 for (var i = 0; i < currentIntervalSpots.length; i++) {
                 	$scope.playbackControls.noSpotsInIntervalMsg = "Spots in this interval: " + currentIntervalSpots.length;
-                    $scope.playbackData.positions.push({
-                        lat: currentIntervalSpots[i].spotDetail.latitude,
-                        lng: currentIntervalSpots[i].spotDetail.longitude});
+                    
+                	//TODO for ui leaflet markers are not displaying, check format of object
+                	//google maps format
+//                	$scope.playbackData.positions.push({
+//                        lat: currentIntervalSpots[i].spotDetail.latitude,
+//                        lng: currentIntervalSpots[i].spotDetail.longitude});
+                	
+                	//leaflet format
+                	$scope.playbackData.positions.push(
+                		{
+                			marker: {
+                				lat: currentIntervalSpots[i].spotDetail.latitude,
+                				lng: currentIntervalSpots[i].spotDetail.longitude}
+                			}
+                	);
                 }
             }
         }
@@ -113,7 +130,22 @@ spotVizControllers.controller('SpotVizController', ['$scope', '$http', '$filter'
         $scope.retrieveSpotSummaryForCallsign = function () {
             if (!angular.isUndefined($scope.search.callsign) && $scope.search.callsign != null) {
                 url = "/spotviz/spotdata/spots/" + $scope.search.callsign;
-                $http.get(url).success(function (data) {
+
+//                $http({
+//                    method: 'GET',
+//                    url: url
+//                 }).then(function (data){
+//
+//                 },function (error){
+//
+//                 });
+                
+                //$http.get(url).success(function (data) {
+                $http({
+                  method: 'GET',
+                  url: url
+                }).then(function (response){
+                	var data = response.data;
                     console.log('data: ' + data)
                     if (Object.keys(data) == 0) {
                         $scope.msg = "Sorry, there's no spot data currently uploaded for callsign ["
@@ -223,7 +255,22 @@ spotVizControllers.controller('SpotVizController', ['$scope', '$http', '$filter'
 
 
             $scope.search.debugMsg = "url is:" + url;
-            $http.get(url).success(function (data) {
+            
+//          $http({
+//          method: 'GET',
+//          url: url
+//       }).then(function (data){
+//
+//       },function (error){
+//
+//       });
+            
+            //$http.get(url).success(function (data) {
+		    $http({
+		      method: 'GET',
+		      url: url
+		    }).then(function (response){
+		    	var data = response.data;
                 if (data == {}) {
                     $scope.search.msg = "No data for callsign: " + $scope.callsign;
                     $scope.search.spots = "";
@@ -236,8 +283,8 @@ spotVizControllers.controller('SpotVizController', ['$scope', '$http', '$filter'
                             + "Spots for selected date range: " + data.length;
                     $scope.search.spots = data;
                 }
-            }).error(function (data) {
-            	console.log(data);
+            }, function (error){
+            	console.log(error);
             	//TODO: msg is not currently displayed on page?
                 $scope.msg = "Failed to retrieve spot summary data at this time. Try later?";
             });
@@ -248,8 +295,14 @@ spotVizControllers.controller('SpotVizController', ['$scope', '$http', '$filter'
             //+ "?fromdate=" + $scope.search.selectedStartDateTime
             //+ "&todate=" + $scope.search.selectedEndDateTime;
             
-            //retrive and parse heatmap counts 
-            $http.get(url).success(function (heatmapData) {
+            //retrieve and parse heatmap counts 
+            //$http.get(url).success(function (heatmapData) {
+            $http({
+                method: 'GET',
+                url: url
+              }).then(function (response){
+            	var heatmapData = response.data;
+            	
                 if (heatmapData == {}) {
                 	$scope.search.showDataDensity = false;
                 }
@@ -260,34 +313,58 @@ spotVizControllers.controller('SpotVizController', ['$scope', '$http', '$filter'
                         legend : [10,100,2000,4000,6000], //angular-cal-heatmap default: [2,4,6,8,10],
                         range: 6, ////angular-cal-heatmap default: 3
                         start: $scope.search.fromDate
-                    };
+                        }
+                };
                     
-                    //reformat data to expected format for Cal-HeatMap
-                    //TODO: can this processing be moved to the endpoint?
-                    var parser = function(data) {
-                    	var stats = {};
-                    	for (var i in data.heatmapCounts) {
-                    		var ts = data.heatmapCounts[i]._id / 1000; 
-                    		stats[ts] = data.heatmapCounts[i].count;
-                    	}
-                    	return stats;
-                    };
-                    heatmapData = parser(heatmapData);
-                    $scope.search.heatmap.config.data = heatmapData;
-                    
-                    //afterLoadData not suppported by directive?
-                    //$scope.search.heatmap.config.afterLoadData = parser;
-                    //toggle flag for ng-if display
-                    $scope.search.showDataDensity = true;
-                }
-        	}).error(function (heatmapData) {
-            	console.log(heatmapData);
+                //reformat data to expected format for Cal-HeatMap
+                //TODO: can this processing be moved to the endpoint?
+                var parser = function(data) {
+                	var parsedData = {};
+                	parsedData.display = {};
+                	parsedData.lookup = {};
+                	for (var i in data.heatmapCounts) {
+                		var ts = data.heatmapCounts[i]._id / 1000; 
+                		parsedData.display[ts] = data.heatmapCounts[i].count;
+                		parsedData.lookup[ts] = { 
+                				firstSpot:  data.heatmapCounts[i].firstSpot,
+                				lastSpot: data.heatmapCounts[i].lastSpot,
+                				count: data.heatmapCounts[i].count
+                		};
+                	}
+                	return parsedData;
+                };
+                var parsedHeatmapData = parser(heatmapData);
+                $scope.search.heatmap.config.data = parsedHeatmapData.display;
+                $scope.search.heatmap.rawdata = parsedHeatmapData.lookup;
+                
+                //TODO lookup of data for a day from onclick is not working here
+                
+                //afterLoadData not supported by directive?
+                //$scope.search.heatmap.config.afterLoadData = parser;
+                //toggle flag for ng-if display
+                $scope.search.showDataDensity = true;
+        	}, function (error){
+            	console.log(error);
             	//TODO: msg is not currently displayed on page?
                 $scope.msg = "Failed to retrieve heatmap data at this time. Try later?";
             });
             
         }
 
+        $scope.showStatsForDate = function(event) {
+        	var clickedDate = event.target.__data__.t;
+        	console.log("heatmap timestamp clicked: " + clickedDate);
+        	$scope.search.heatmap.clickedDateFormatted = new Date(clickedDate);
+        	$scope.search.heatmap.clickedDate = clickedDate;
+        	
+        	//open dialog for heatmap day click
+        	//$scope.clickToOpen = function () {
+            ngDialog.open({ 
+            	template: 'perDateStatsTemplate', 
+            	className: 'ngdialog-theme-default',
+            	scope: $scope
+            });
+        }
         
         //Start the playback
         $scope.start = function () {
@@ -318,7 +395,9 @@ spotVizControllers.controller('SpotVizController', ['$scope', '$http', '$filter'
                     //calc array of interval start and end times between selected start and end
                     var tempIntervalCount = 0;
                     var currentIntervalStartDate = moment.utc(startMoment);
+                    var currentIntervalStartDateLocal;
                     var currentIntervalEndDate = null;
+                    var currentIntervalEndDateLocal = null;
                     $scope.playbackControls.iterations = numberOfIntervalsInSelectedRange;
                     while (tempIntervalCount < numberOfIntervalsInSelectedRange) {
 
@@ -332,7 +411,9 @@ spotVizControllers.controller('SpotVizController', ['$scope', '$http', '$filter'
 
                         $scope.playbackControls.intervalBoundaries[tempIntervalCount] = {
                             intervalStartDate: currentIntervalStartDate,
-                            intervalEndDate: currentIntervalEndDate
+                            intervalStartDateLocal: moment(currentIntervalStartDate).local().format("YYYY-MM-DD HH:mm:ss"),
+                            intervalEndDate: currentIntervalEndDate,
+                            intervalEndDateLocal: moment(currentIntervalEndDate).local().format("YYYY-MM-DD HH:mm:ss")
                         };
 
                         tempIntervalCount++;

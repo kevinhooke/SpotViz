@@ -7,13 +7,14 @@
          metadata-complete="false">
 
 <!-- 	<servlet>
-        <servlet-name>javax.ws.rs.core.Application</servlet-name>
+        <servlet-name>jaxrs</servlet-name>
+        <servlet-class>kh.callsign.spotcollector.endpoint.SpotCollectorJaxRsApplication</servlet-class>
         <load-on-startup>1</load-on-startup>
     </servlet>
     <servlet-mapping>
-        <servlet-name>javax.ws.rs.core.Application</servlet-name>
+        <servlet-name>jaxrs</servlet-name>
         <url-pattern>/spotviz/*</url-pattern>
-    </servlet-mapping>
- -->         
+    </servlet-mapping> -->
+       
 </web-app>
 

@@ -164,7 +164,10 @@ public class SpotDataEndpoint {
 		subtractList1.add(mod);
 
 		DBObject query = BasicDBObjectBuilder.start().push("$group").push("_id")
-				.add("$subtract", subtractList1).pop().add("count", new BasicDBObject("$sum", 1))
+				.add("$subtract", subtractList1).pop()
+				.add("count", new BasicDBObject("$sum", 1))
+				.add("firstSpot", new BasicDBObject("$min", "$spotReceivedTimestamp"))
+				.add("lastSpot", new BasicDBObject("$max", "$spotReceivedTimestamp"))
 				.get();
 		return query;
 	}
@@ -186,7 +189,7 @@ public class SpotDataEndpoint {
 			@QueryParam("fromdate") String fromDate, @QueryParam("todate") String toDate) {
 
 		/*
-		 * db.Spot.aggregate( [ {$match: {spotter: "kk6dct"}},
+		 * db.Spot.aggregate( [ {$match: {spotter: "KK6DCT"}},
 		 * 
 		 * {"$group": { "_id": { "$subtract": [ { "$subtract": [
 		 * "$spotReceivedTimestamp", new Date("1970-01-01") ] }, { "$mod": [ {
@@ -257,17 +260,14 @@ public class SpotDataEndpoint {
 
 			pipeline.add(matchFields);
 			pipeline.add(groupFields);
-			//TODO test this and copy approach to other aggregation queries
+			//updated to add now required cursor aggregation option
 			AggregationOptions aggregationOptions = AggregationOptions.builder()
 					.outputMode(AggregationOptions.OutputMode.CURSOR).build();
-			//AggregationOutput output = col.aggregate(pipeline);
 			Iterator<DBObject> cursor =  col.aggregate(pipeline, aggregationOptions);
 			
-			//AggregationOutput output = col.aggregate(pipeline);
 			// TODO should data returned include pagination details
 			jsonResult.append("{ \"heatmapCounts\" : [ ");
 			boolean firstResult = true;
-			//for (DBObject result : output.results()) {
 			while(cursor.hasNext()) {
 				DBObject next = cursor.next();
 				if (firstResult) {
