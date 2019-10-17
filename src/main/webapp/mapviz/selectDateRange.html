@@ -1,8 +1,8 @@
 <script type="text/ng-template" id="perDateStatsTemplate">
     <h1>Spot Data for day {{ search.heatmap.clickedDateFormatted }}</h1>
 	<p>Clicked ts: {{ search.heatmap.clickedDate }}</p>
-    <p>First spot received at: {{ search.heatmap.rawdata[search.heatmap.clickedDate/1000].firstSpot }}</p>
-    <p>First spot received at: {{ search.heatmap.rawdata[search.heatmap.clickedDate/1000].LastSpot }}</p>
+    <p>First spot received at: {{ search.heatmap.rawdata[search.heatmap.clickedDate/1000].firstSpot.$date }}</p>
+    <p>Last spot received at: {{ search.heatmap.rawdata[search.heatmap.clickedDate/1000].lastSpot.$date }}</p>
 	<p>Spot count total for day: {{ search.heatmap.rawdata[search.heatmap.clickedDate/1000].count }}
 </script>
 

@@ -323,7 +323,21 @@ spotVizControllers.controller('SpotVizController', ['$scope', '$http', '$filter'
                 	parsedData.display = {};
                 	parsedData.lookup = {};
                 	for (var i in data.heatmapCounts) {
-                		var ts = data.heatmapCounts[i]._id / 1000; 
+                		var ts = data.heatmapCounts[i]._id; //test removing this: / 1000; 
+                		
+                		console.log("ts before: " + new Date(ts));
+                		
+                		//apply a tz offset for current user based onn cal-heatmap forcing local tz issue
+                		//var tzOffset = new Date().getTimezoneOffset(); //offset in mins
+                		//console.log(tzOffset);
+                		//var tzAdjustment = tzOffset * 60 * 1000;
+                		//console.log(tzAdjustment);
+                		//ts = ts + tzAdjustment;
+                		
+                		//console.log("ts after: " + new Date(ts));
+                		
+                		ts = ts / 1000; // change back to seconds for cal-heatmap expected format
+                		
                 		parsedData.display[ts] = data.heatmapCounts[i].count;
                 		parsedData.lookup[ts] = { 
                 				firstSpot:  data.heatmapCounts[i].firstSpot,
@@ -337,10 +351,9 @@ spotVizControllers.controller('SpotVizController', ['$scope', '$http', '$filter'
                 $scope.search.heatmap.config.data = parsedHeatmapData.display;
                 $scope.search.heatmap.rawdata = parsedHeatmapData.lookup;
                 
-                //TODO lookup of data for a day from onclick is not working here
-                
                 //afterLoadData not supported by directive?
                 //$scope.search.heatmap.config.afterLoadData = parser;
+                
                 //toggle flag for ng-if display
                 $scope.search.showDataDensity = true;
         	}, function (error){
@@ -352,13 +365,33 @@ spotVizControllers.controller('SpotVizController', ['$scope', '$http', '$filter'
         }
 
         $scope.showStatsForDate = function(event) {
+        	
+        	//workaound for cal-heatmap tz issue: https://github.com/wa0x6e/cal-heatmap/issues/126
+        	//cal-heatmap problem: clicked 1/26/2018 has ts : 1516953600000 : Fri Jan 26 2018 00:00:00 GMT-0800
+        	// id in array of data                   has ts : 1517011200000 : Fri Jan 26 2018 16:00:00 GMT-080
+        	
+        	//               clicked 3/17/2018       has ts : 1521270000000 : Sat Mar 17 2018 00:00:00 GMT-0700
+        	// id in array                                  : 1521331200000 : Sat Mar 17 2018 17:00:00 GMT-0700
+        	// after calc                                   : 1521298800000 : Sat Mar 17 2018 07:00:00 GMT-0700
+        	
+        	//workaround: new Date( 1521270000000 + (( new Date(1521270000000).getTimezoneOffset() + (1*60)) * 60 * 1000)).getTime()
+        	//the diff seems to be time + (24 - 7), not time + 7 (the current tz offset) 
+        	
         	var clickedDate = event.target.__data__.t;
         	console.log("heatmap timestamp clicked: " + clickedDate);
+        	
+        	//add tz adjustment (now working)
+        	var tzOffset = new Date(clickedDate).getTimezoneOffset(); //offset in mins
+    		console.log(tzOffset);
+    		var actualOffset = 24 - tzOffset/60
+    		var tzAdjustment = actualOffset * 60 * 60 * 1000;
+    		console.log(tzAdjustment);
+    		clickedDate = clickedDate + tzAdjustment;
+        	
         	$scope.search.heatmap.clickedDateFormatted = new Date(clickedDate);
         	$scope.search.heatmap.clickedDate = clickedDate;
         	
         	//open dialog for heatmap day click
-        	//$scope.clickToOpen = function () {
             ngDialog.open({ 
             	template: 'perDateStatsTemplate', 
             	className: 'ngdialog-theme-default',
