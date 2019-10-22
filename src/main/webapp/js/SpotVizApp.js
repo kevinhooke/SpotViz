@@ -1,5 +1,5 @@
 var spotVizApp = angular.module('SpotVizApp', [ 'ui.bootstrap', "ui.router", "ngAnimate",
-		"ui.date", "ngMap", "ngSanitize", "calHeatmap", "ui-leaflet",
+		"ui.date", "ngSanitize", "calHeatmap", "ui-leaflet",
 		"SpotVizControllers", "SpotDataControllers",
 		"angulartics", "angulartics.google.analytics", 'ngDialog' ]);
 
@@ -74,55 +74,7 @@ var spotVizApp = angular.module('SpotVizApp', [ 'ui.bootstrap', "ui.router", "ng
             templateUrl: 'about.html'
         })
         
-//        // nested state examaples 
-//        // each of these sections will have their own view
-//        // url will be nested (/form/profile)
-//        .state('form.profile', {
-//            url: '/profile',
-//            templateUrl: 'form-profile.html'
-//        })
-//        
-//        // url will be /form/interests
-//        .state('form.interests', {
-//            url: '/interests',
-//            templateUrl: 'form-interests.html'
-//        })
-//        
-//        // url will be /form/payment
-//        .state('form.payment', {
-//            url: '/payment',
-//            templateUrl: 'form-payment.html'
-//        });
-        
     // catch all route
     // send users to the home page 
     $urlRouterProvider.otherwise('/home');
 });
-
-	
-	
-//prior ngRoute approach
-//
-//var spotVizApp = angular.module('SpotVizApp', [ "ngRoute", "ngAnimate",
-//		"ui.date", "ngMap", "ui.bootstrap", "SpotVizControllers" ]);
-//
-//spotVizApp.config([ '$routeProvider', function($routeProvider) {
-//	$routeProvider.when('/', {
-//		templateUrl : 'home.html',
-//		controller : 'HomeController'
-//	}).when('/mapviz', {
-//		templateUrl : 'mapviz/mapviz.html',
-//		controller : 'SpotVizController'
-//	}).when('/upload', {
-//		templateUrl : 'howToUpload.html'
-//	}).when('/faq', {
-//		templateUrl : 'faq.html'
-//	}).when('/bug', {
-//		templateUrl : 'bug.html'
-//	}).when('/about', {
-//		templateUrl : 'about.html',
-//		controller : 'AboutController'
-//	}).otherwise({
-//		redirectTo : '/'
-//	});
-//} ]);

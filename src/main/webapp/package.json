@@ -1,0 +1,23 @@
+{
+  "name": "spotviz",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "kevinhooke",
+  "license": "MIT",
+  "dependencies": {
+    "angular": "^1.7.8",
+    "angular-animate": "^1.7.8",
+    "angular-sanitize": "^1.7.8",
+    "angular-ui-bootstrap": "^2.5.6",
+    "angular-ui-router": "^1.0.23",
+    "ng-dialog": "^1.4.0",
+    "ui-leaflet": "^1.0.3"
+  },
+  "devDependencies": {
+    "cypress": "^3.4.1"
+  }
+}

@@ -103,23 +103,22 @@ spotVizControllers.controller('SpotVizController', ['$scope', '$http', '$filter'
             }
             else{
                 for (var i = 0; i < currentIntervalSpots.length; i++) {
-                	$scope.playbackControls.noSpotsInIntervalMsg = "Spots in this interval: " + currentIntervalSpots.length;
                     
-                	//TODO for ui leaflet markers are not displaying, check format of object
-                	//google maps format
-//                	$scope.playbackData.positions.push({
-//                        lat: currentIntervalSpots[i].spotDetail.latitude,
-//                        lng: currentIntervalSpots[i].spotDetail.longitude});
+                	if(currentIntervalSpots[i].spotDetail.latitude != undefined){
                 	
-                	//leaflet format
-                	$scope.playbackData.positions.push(
-                		{
-                			marker: {
-                				lat: currentIntervalSpots[i].spotDetail.latitude,
-                				lng: currentIntervalSpots[i].spotDetail.longitude}
-                			}
-                	);
+	                	//google maps format
+	//                	$scope.playbackData.positions.push({
+	//                        lat: currentIntervalSpots[i].spotDetail.latitude,
+	//                        lng: currentIntervalSpots[i].spotDetail.longitude});
+	                	
+	                	//leaflet format
+	                	$scope.playbackData.positions.push( {
+            				lat: parseFloat(currentIntervalSpots[i].spotDetail.latitude),
+            				lng: parseFloat(currentIntervalSpots[i].spotDetail.longitude)
+            			});
+                	}
                 }
+                $scope.playbackControls.noSpotsInIntervalMsg = "Spots in this interval: " + $scope.playbackData.positions.length
             }
         }
 
@@ -131,16 +130,6 @@ spotVizControllers.controller('SpotVizController', ['$scope', '$http', '$filter'
             if (!angular.isUndefined($scope.search.callsign) && $scope.search.callsign != null) {
                 url = "/spotviz/spotdata/spots/" + $scope.search.callsign;
 
-//                $http({
-//                    method: 'GET',
-//                    url: url
-//                 }).then(function (data){
-//
-//                 },function (error){
-//
-//                 });
-                
-                //$http.get(url).success(function (data) {
                 $http({
                   method: 'GET',
                   url: url
@@ -255,17 +244,6 @@ spotVizControllers.controller('SpotVizController', ['$scope', '$http', '$filter'
 
 
             $scope.search.debugMsg = "url is:" + url;
-            
-//          $http({
-//          method: 'GET',
-//          url: url
-//       }).then(function (data){
-//
-//       },function (error){
-//
-//       });
-            
-            //$http.get(url).success(function (data) {
 		    $http({
 		      method: 'GET',
 		      url: url
@@ -323,21 +301,8 @@ spotVizControllers.controller('SpotVizController', ['$scope', '$http', '$filter'
                 	parsedData.display = {};
                 	parsedData.lookup = {};
                 	for (var i in data.heatmapCounts) {
-                		var ts = data.heatmapCounts[i]._id; //test removing this: / 1000; 
-                		
-                		console.log("ts before: " + new Date(ts));
-                		
-                		//apply a tz offset for current user based onn cal-heatmap forcing local tz issue
-                		//var tzOffset = new Date().getTimezoneOffset(); //offset in mins
-                		//console.log(tzOffset);
-                		//var tzAdjustment = tzOffset * 60 * 1000;
-                		//console.log(tzAdjustment);
-                		//ts = ts + tzAdjustment;
-                		
-                		//console.log("ts after: " + new Date(ts));
-                		
+                		var ts = data.heatmapCounts[i]._id; //test removing this: / 1000;                 		
                 		ts = ts / 1000; // change back to seconds for cal-heatmap expected format
-                		
                 		parsedData.display[ts] = data.heatmapCounts[i].count;
                 		parsedData.lookup[ts] = { 
                 				firstSpot:  data.heatmapCounts[i].firstSpot,
@@ -382,10 +347,8 @@ spotVizControllers.controller('SpotVizController', ['$scope', '$http', '$filter'
         	
         	//add tz adjustment (now working)
         	var tzOffset = new Date(clickedDate).getTimezoneOffset(); //offset in mins
-    		console.log(tzOffset);
     		var actualOffset = 24 - tzOffset/60
     		var tzAdjustment = actualOffset * 60 * 60 * 1000;
-    		console.log(tzAdjustment);
     		clickedDate = clickedDate + tzAdjustment;
         	
         	$scope.search.heatmap.clickedDateFormatted = new Date(clickedDate);
