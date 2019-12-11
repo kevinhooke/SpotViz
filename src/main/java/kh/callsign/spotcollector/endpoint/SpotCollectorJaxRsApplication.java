@@ -5,5 +5,5 @@ import javax.ws.rs.core.Application;
 
 @ApplicationPath("/spotviz")
 public class SpotCollectorJaxRsApplication extends Application {
-	String donothing;
+	String donothing2;
 }
