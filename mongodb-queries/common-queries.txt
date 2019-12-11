@@ -1,0 +1,13 @@
+//find one
+db.Spot.find().limit(1)
+
+//in reverse order, most recent first
+db.Spot.find().sort({ "spotReceivedTimestamp" : -1  }).limit(2)
+
+db.Spot.find().count()
+
+//find hamqth errors
+db.Spot.find({ "spotDetail.errorMessage" : "No response frm HamQTH, or failed lookup (unknown callsign?)" }).count()
+
+//delete all missing hamqth data
+db.Spot.deleteMany({ "spotDetail.errorMessage" : "No response frm HamQTH, or failed lookup (unknown callsign?)" })

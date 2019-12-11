@@ -1,0 +1,26 @@
+//group on hour
+db.Spot.aggregate([ { $match : { "spotReceivedTimestamp" : { $gte : ISODate( "2018-01-27T00:00:00Z"), $lt : ISODate(
+"2018-01-27T23:59:59Z") } } }, { $group : { "_id" : { "hour" : { "$hour" : "$spotReceivedTimestamp" } } } } ])
+
+//count hour groups
+db.Spot.aggregate([ 
+{ $match : { "spotReceivedTimestamp" : { $gte : ISODate( "2018-01-27T00:00:00Z"), $lt : ISODate( "2018-06-27T23:59:59Z") } } }, 
+{ $group : { "_id" : 
+	{ 
+	  "year" : { "$year" : "$spotReceivedTimestamp" },
+	  "month" : { "$month" : "$spotReceivedTimestamp"  },
+	  "day" : { "$dayOfMonth" : "$spotReceivedTimestamp" },
+	  "hour" : { "$hour" : "$spotReceivedTimestamp" }
+	},
+	count: { $sum:1} } },
+{ $sort : { _id : 1 } }
+])
+
+//
+// MUCH simpler counts per day in date range
+// can replace existing query with this
+//
+db.Spot.aggregate([ { $match : { "spotReceivedTimestamp" : { $gte : ISODate( "2018-01-27T00:00:00Z"), $lt : ISODate( "2018-03-29T23:59:59Z") } } }, 
+{ $group : { "_id" : 
+	{ "day" : { "$dayOfMonth" : "$spotReceivedTimestamp" } }, 
+count: { $sum:1} } } ])
