@@ -1,4 +1,4 @@
-angular.module('SpotVizApp.services', [])
+var MapVizServices = angular.module('SpotVizApp.services', [])
     .factory('dateService', function () {
 
         var serviceImpl = {};
@@ -22,3 +22,5 @@ angular.module('SpotVizApp.services', [])
 
         return serviceImpl;
     });
+
+module.exports = MapVizServices;

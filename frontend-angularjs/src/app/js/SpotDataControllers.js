@@ -15,8 +15,8 @@ spotDataControllers.controller('SpotDataController', ['$scope', '$http', '$filte
 	//initial page load
 	$scope.init = function(){
 		console.log("ctrl init");
-		
-		var url = "/spotviz/spotdata/topUploads";
+
+        var url = process.env.API_URL + "/spotviz/spotdata/topUploads";
 //        $http.get(url).success(function (data) {
 //            console.log('data: ' + data);
 //            $scope.spotdata.data = data;
@@ -35,7 +35,7 @@ spotDataControllers.controller('SpotDataController', ['$scope', '$http', '$filte
 	}
 	
 	$scope.retrieveSpotDataForCallsign = function(){
-		var url = "/spotviz/spotdata/spots/" + $scope.datasearch.callsign;
+        var url = process.env.API_URL + "/spotviz/spotdata/spots/" + $scope.datasearch.callsign;
 		
 //        $http.get(url).success(function (data) {
 //            console.log('data: ' + data);
@@ -71,3 +71,5 @@ spotDataControllers.controller('SpotDataController', ['$scope', '$http', '$filte
 	}
 
 }]);
+
+module.exports = spotDataControllers;

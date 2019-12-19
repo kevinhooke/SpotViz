@@ -1,13 +1,17 @@
-var spotVizControllers = angular.module('SpotVizControllers', ['ngAnimate', 'ngSanitize']);
+//import historyPlaybackControlsTemplate from "../mapviz/historyPlaybackControls.html";
+//import visualizationPlaybackTemplate from "../mapviz/visualizationPlayback.html";
 
-spotVizControllers.filter('spotIntervalFilter', function () {
+var spotVizControllers = angular.module('SpotVizControllers', ['ngAnimate', 'ngSanitize',
+    'angularMoment']);
+
+spotVizControllers.filter('spotIntervalFilter', ['moment', function (moment) {
 
     return function (data, interval, intervalBoundaries) {
         var filteredData = [];
         var boundary = intervalBoundaries[interval];
         //TODO if have index positions from a prior run, use those and do a slice
         //otherwise iterate through to find posts within the interval
-        for (i = 0; i < data.length; i++) {
+        for (var i = 0; i < data.length; i++) {
             currentSpotDate = data[i].spotReceivedTimestamp.$date;
             //if current date is after the last date for this interval, then skip the rest
             if (moment.utc(currentSpotDate).isAfter(boundary.intervalEndDate)) {
@@ -24,15 +28,15 @@ spotVizControllers.filter('spotIntervalFilter', function () {
         return filteredData;
     }
 
-});
+}]);
 
-spotVizControllers.controller('uiLeafletController', function ($scope) {
+spotVizControllers.controller('uiLeafletController', function () {
 	//
 });
 
 spotVizControllers.controller('SpotVizController', ['$scope', '$http', '$filter', '$interval',
-    '$state', 'ngDialog', 
-    function ($scope, $http, $filter, $interval, $state, ngDialog) {
+    '$state', 'ngDialog', 'moment',
+    function ($scope, $http, $filter, $interval, $state, ngDialog, moment) {
 
         //set focus on callsign field
         angular.element('#callsign').trigger('focus');
@@ -128,8 +132,8 @@ spotVizControllers.controller('SpotVizController', ['$scope', '$http', '$filter'
          */
         $scope.retrieveSpotSummaryForCallsign = function () {
             if (!angular.isUndefined($scope.search.callsign) && $scope.search.callsign != null) {
-                url = "/spotviz/spotdata/spots/" + $scope.search.callsign;
-
+                var url = process.env.API_URL + "/spotviz/spotdata/spots/" + $scope.search.callsign;
+                console.log("$http GET request: " + url);
                 $http({
                   method: 'GET',
                   url: url
@@ -229,16 +233,19 @@ spotVizControllers.controller('SpotVizController', ['$scope', '$http', '$filter'
         	
         	//set heatmap display back to false to force to redraw if there is data for range
         	$scope.search.showDataDensity = false;
-        	
-            var fromTimeOnly = moment($scope.search.fromTime).format("HH:mm:ss");
-            var toTimeOnly = moment($scope.search.toTime).format("HH:mm:ss");
+
+        	//when using timepicker
+            //var fromTimeOnly = moment($scope.search.fromTime).format("HH:mm:ss");
+            //var toTimeOnly = moment($scope.search.toTime).format("HH:mm:ss");
+            var fromTimeOnly = $scope.search.fromTime;
+            var toTimeOnly = $scope.search.toTime;
             var formattedFromDate = moment($scope.search.fromDate).format("YYYY-MM-DD");
             var formattedToDate = moment($scope.search.toDate).format("YYYY-MM-DD");
             $scope.search.selectedStartDateTime = formattedFromDate + "T" + fromTimeOnly + "Z";
             $scope.search.selectedEndDateTime = formattedToDate + "T" + toTimeOnly + "Z";
 
 
-            var url = "/spotviz/spotdata/spots/" + $scope.search.callsign
+            var url = process.env.API_URL + "/spotviz/spotdata/spots/" + $scope.search.callsign
                     + "?fromdate=" + $scope.search.selectedStartDateTime
                     + "&todate=" + $scope.search.selectedEndDateTime;
 
@@ -268,7 +275,7 @@ spotVizControllers.controller('SpotVizController', ['$scope', '$http', '$filter'
             });
             
           //build heatmap options
-            url = "/spotviz/spotdata/heatmapCounts/" + $scope.search.callsign;
+            url = process.env.API_URL + "/spotviz/spotdata/heatmapCounts/" + $scope.search.callsign;
             //TODO: add date range
             //+ "?fromdate=" + $scope.search.selectedStartDateTime
             //+ "&todate=" + $scope.search.selectedEndDateTime;
@@ -321,6 +328,7 @@ spotVizControllers.controller('SpotVizController', ['$scope', '$http', '$filter'
                 
                 //toggle flag for ng-if display
                 $scope.search.showDataDensity = true;
+
         	}, function (error){
             	console.log(error);
             	//TODO: msg is not currently displayed on page?
@@ -476,3 +484,14 @@ spotVizControllers.controller('AboutController', function ($scope) {
 
 spotVizControllers.controller('HomeController', function ($scope) {
 });
+
+// //create components
+// spotVizControllers.component('historyPlaybackControls', {
+//     template : historyPlaybackControlsTemplate,
+//     bindings: { playbackControls: '=' }
+// });
+// spotVizControllers.component('visualizationPlayback', {
+//     template : visualizationPlaybackTemplate
+// });
+
+//module.exports = spotVizControllers;

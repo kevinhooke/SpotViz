@@ -1,7 +1,107 @@
 <!-- Visualization playback -->
 
-<div ng-include src="'/mapviz/historyPlaybackControls.html'">
-</div>
+<!-- <div ng-include src="require('/mapviz/historyPlaybackControls.html')">
+</div>-->
 
-<div ng-include src="'/mapviz/visualizationPlayback.html'">
+<!--<div ng-include="'historyPlaybackControls.html'">-->
+<!--</div>-->
+
+<div class="row">
+    <div class="col-sm-12">
+        <p>
+            Interval rate: <select ng-model="playbackControls.timeInterval"
+                                   ng-change="changeIntervalLength()">
+            <option value="5">5 mins</option>
+            <option value="10">10 mins</option>
+            <option value="15">15 mins</option>
+            <option value="30">30 mins</option>
+            <option value="60">1 hour</option>
+            <option value="120">2 hours</option>
+            <option value="180">3 hours</option>
+        </select> Update rate: <select ng-model="playbackControls.updateRate"
+                                       ng-change="changeRate()">
+            <option value="1">1 secs</option>
+            <option value="2">2 secs</option>
+            <option value="3">3 secs</option>
+            <option value="4">4 secs</option>
+        </select>
+
+            <button class="btn btn-primary" data-ng-click="start()">
+                <span class="glyphicon glyphicon-play" aria-hidden="true"></span>Start
+            </button>
+
+            <button class="btn btn-primary" data-ng-click="pause()">
+                <span class="glyphicon glyphicon-pause" aria-hidden="true"></span>Pause
+            </button>
+
+            <button class="btn btn-primary" data-ng-click="reset()">
+                <span class="glyphicon glyphicon-pause" aria-hidden="true"></span>Reset
+            </button>
+
+            State: {{playbackControls.state}}
+        <p>
+    </div>
+</div>
+<div class="row">
+    <div class="col-sm-6">
+        <div class="row">
+            <div class="col-sm-6">Playing interval
+                {{playbackControls.currentInterval}}</div>
+            <div class="col-sm-6">of {{playbackControls.currentInterval}}</div>
+        </div>
+        <div class="row">
+            <div class="col-sm-12">
+                {{playbackControls.noSpotsInIntervalMsg}}
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-6">
+        <div class="row">
+            <div class="col-sm-2">From</div>
+            <div class="col-sm-4">
+                {{playbackControls.intervalBoundaries[playbackControls.currentInterval].intervalStartDate}}
+            </div>
+            <div class="col-sm-4"> /
+                {{playbackControls.intervalBoundaries[playbackControls.currentInterval].intervalStartDateLocal}}
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-2">to</div>
+            <div class="col-sm-4">
+                {{playbackControls.intervalBoundaries[playbackControls.currentInterval].intervalEndDate}}
+            </div>
+            <div class="col-sm-4">
+                {{playbackControls.intervalBoundaries[playbackControls.currentInterval].intervalEndDateLocal}}
+            </div>
+
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-sm-12">
+        <progressbar max="playbackControls.maxValue"
+                     value="playbackControls.currentInterval" type="info"></progressbar>
+    </div>
+    <div></div>
+    <div></div>
+</div>
+<div class="row">
+    <div class="col-sm-2">{{selectedStartDateTime}}</div>
+    <div class="col-sm-offset-8 col-sm-2">{{selectedEndDateTime}}</div>
+</div>
+<!--<div ng-include="'visualizationPlayback.html'">-->
+<!--</div>-->
+
+<!--
+<div></div>
+    <ng-include src="'/mapviz/visualizationPlayback.html'"/>
+</div>
+-->
+<!--
+<visualization-playback></visualization-playback>
+-->
+<div style="height:500px;" ng-controller="uiLeafletController">
+
+    <leaflet id="map-simple-map" width="90%" height="100%" markers="playbackData.positions"></leaflet>
+
 </div>

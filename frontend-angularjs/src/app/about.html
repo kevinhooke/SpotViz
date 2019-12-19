@@ -1,11 +1,8 @@
 <div class="row">
 	<div class="col-md-12">
 		<h3>About SpotViz</h3>
-		<p>In addition to hopefully providing an interesting service to visualize the geographic location
-		of received signals over time, this app has been (and still is) a personal development playground 
-		for trying out some different 
-		technologies for building a webapp in a 'single page application' style, using AngularJS for the 
-		front-end, and a Java EE7 based back end. The source for the app is
+		<p>This webapp provides the ability to visualize the geographic location
+		of received signals over time by parsing WSJT-X log files. The source for the app is
 		available on GitHub <a href="https://github.com/kevinhooke/SpotViz" target="_blank">here</a>.</p>
 		<p>Here's a summary of some of the technologies/libraries used
 		to build this app: </p>
@@ -19,7 +16,7 @@
 	<div class="col-md-9">
 		<p>The front-end client for this site is using AngularJS. Data for display is retrieved as needed
 		by calling JAX-RS resources running on WildFly. All the processing of the data into intervals
-		for display is achieved with JavasScript and AngularJS.</p>
+		for display is achieved with JavaScript and AngularJS.</p>
 	</div>
 </div>
 
@@ -29,8 +26,7 @@
 	</div>
 	<div class="col-md-9">
 		<p>The backend for the app, mainly JAX-RS resources and data access to a MongoDB database, is running
-		on a <a target="_blank" href="http://wildfly.org/">WildFly 8.1</a> cartridge hosted on 
-		<a target="_blank" href="https://www.openshift.com/">OpenShift</a>.</p>
+		on <a target="_blank" href="http://wildfly.org/">WildFly 17</a>.</p>
 	</div>
 </div>
 

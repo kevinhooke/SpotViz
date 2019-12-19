@@ -6,23 +6,30 @@
 </div>
 
 <div class="row">
-	<div class="col-md-3">
-		<h4>What is This?</h4>
-                <p>This site provides a <i>historical playback</i> of FT8/JT9/JT65 digital
-			mode signals transmitted and received by amateur radio operators,
-			showing patterns of signals over time.</p>
+	<div class="col-sm-6">
+		<div class="row">
+			<div class="col-md-12">
+				<h4>What is This?</h4>
+		                <p>This site provides a <i>historical playback</i> of FT8/JT9/JT65 digital
+					mode signals transmitted and received by amateur radio operators,
+					showing patterns of signals over time.</p>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-md-12">
+			<h4>How do I get started?</h4>
+			<p>If you have already uploaded a data log file from WSJT-X, you can click on 
+			<a ui-sref="visualize.selectCallsign">'Visualize'</a> above to
+			pick a data/time range for playback of your data plotted on Google Maps. You can also view
+			other Amateur Operator's log data that has already been updated - click <a ui-sref="searchUploadsByCallsign">'Browse Data'</a></p>
+			<p>To upload new data, click <a ui-sref="upload">'How To Upload Your Spots'</a>.
+			</p>
+			<p>Got questions? Check the <a ui-sref="faq">FAQ</a>.</p>
+			</div>
+		</div>
 	</div>
-
-	<div class="col-md-9">
-	<h4>How do I get started?</h4>
-	<p>If you have already uploaded a data log file from WSJT-X, you can click on 
-	<a ui-sref="visualize.selectCallsign">'Visualize'</a> above to
-	pick a data/time range for playback of your data plotted on Google Maps. You can also view
-	anyone else's data that has already been updated - click <a ui-sref="searchUploadsByCallsign">'Browse Data'</a></p>
-	<p>To upload new data, click <a ui-sref="upload">'How To Upload Your Spots'</a>.
-	</p>
-	<p>Got questions? Check the <a ui-sref="faq">FAQ</a>.</p>
+	<div class="col-sm-6">
+		<img width="60%" height="60%" align="top" src="images/playback09202019.gif"/>
 	</div>
-
-
 </div>
+
