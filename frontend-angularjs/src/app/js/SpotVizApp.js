@@ -55,7 +55,12 @@ import CalHeatMap from 'cal-heatmap';
 //import * as CalHeatMap from '../../../bower_components/cal-heatmap/cal-heatmap.js';
 //import * as CalHeatMap from 'cal-heatmap';
 //require('../../../bower_components/cal-heatmap/cal-heatmap.js');
-import 'angular-cal-heatmap';
+
+//PREVIOUS WORKING library
+//import 'angular-cal-heatmap';
+//test modified version
+import './calHeatmapKH.js';
+
 //require('../../../bower_components/angular-cal-heatmap-directive/dist/1.3.0/calHeatmap.min.js');
 //import '../../../bower_components/angular-cal-heatmap-directive/dist/1.3.0/calHeatmap.min.js';
 
@@ -75,11 +80,14 @@ require('./SpotDataControllers');
 console.log("run mode: " + process.env.NODE_ENV );
 console.log("api_url: " + process.env.API_URL );
 
-export default CalHeatMap;
-
+//20200105 previous working
+// var spotVizApp = angular.module('SpotVizApp', [ 'angularMoment', "ui.router", "ngAnimate",
+// 		"ui.date", "ngSanitize", "calHeatmap", "ui-leaflet",
+// 		"SpotVizControllers", "SpotDataControllers", 'ngDialog' ]);
+//updated, removed
 var spotVizApp = angular.module('SpotVizApp', [ 'angularMoment', "ui.router", "ngAnimate",
-		"ui.date", "ngSanitize", "calHeatmap", "ui-leaflet",
-		"SpotVizControllers", "SpotDataControllers", 'ngDialog' ]);
+    "ui.date", "ngSanitize", "calHeatmapKH", "ui-leaflet",
+    "SpotVizControllers", "SpotDataControllers", 'ngDialog' ]);
 
 // //create components
 // spotVizApp.component('historyPlaybackControls', {

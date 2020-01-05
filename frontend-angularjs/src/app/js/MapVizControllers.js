@@ -62,8 +62,9 @@ spotVizControllers.controller('SpotVizController', ['$scope', '$http', '$filter'
         $scope.search.fromDateOptions = null;
         $scope.search.toDateOptions = null;
 
-        //show data density display
+        //show data density displays
         $scope.search.showDataDensity = false;
+        $scope.search.showDataDensityPerHour = false;
 
         //TODO what is this used for?
         $scope.search.date = moment();
@@ -71,6 +72,7 @@ spotVizControllers.controller('SpotVizController', ['$scope', '$http', '$filter'
         //heatmap config
         $scope.search.heatmap = {};
         $scope.search.heatmap.config = {};
+        $scope.search.heatmap.perhourConfig = {};
         
         //playback controls
         var runningCounter = null;
@@ -227,7 +229,7 @@ spotVizControllers.controller('SpotVizController', ['$scope', '$http', '$filter'
         }
 
         /*
-         * Retrieves spots for given callsign and date range.
+         * Retrieves spots for given callsign and date range, with heatmap data.
          */
         $scope.retrieve = function () {
         	
@@ -295,8 +297,10 @@ spotVizControllers.controller('SpotVizController', ['$scope', '$http', '$filter'
                     $scope.search.heatmap = {};
                     $scope.search.heatmap.config = {
                         domain: "month",
-                        legend : [10,100,2000,4000,6000], //angular-cal-heatmap default: [2,4,6,8,10],
-                        range: 6, ////angular-cal-heatmap default: 3
+                        //legend: [10,100,2000,4000,6000], //bug: more than 4 range values doesn't work
+                        legend : [1000, 2000, 4000, 6000], //angular-cal-heatmap default: [2,4,6,8],
+                        range: 6, //angular-cal-heatmap default: 3, when domain=month, displays 6 months
+                        subDomainTextFormat: "%d",
                         start: $scope.search.fromDate
                         }
                 };
@@ -363,13 +367,108 @@ spotVizControllers.controller('SpotVizController', ['$scope', '$http', '$filter'
         	$scope.search.heatmap.clickedDate = clickedDate;
         	
         	//open dialog for heatmap day click
-            ngDialog.open({ 
-            	template: 'perDateStatsTemplate', 
-            	className: 'ngdialog-theme-default',
-            	scope: $scope
-            });
+            //uncomment for popup dialog
+            // ngDialog.open({
+            // 	template: 'perDateStatsTemplate',
+            // 	className: 'ngdialog-theme-default',
+            // 	scope: $scope
+            // });
+            $scope.showHeatmapPerHour(event);
         }
-        
+
+
+        $scope.showHeatmapPerHour = function(event){
+            console.log("showHeatmapPerHour() called");
+            $scope.retrieveHeatmapForHour();
+        }
+
+        /*
+        * Retrieves heatmap of spots for selected day for hour.
+        */
+        $scope.retrieveHeatmapForHour = function () {
+
+            //set heatmap display back to false to force to redraw if there is data for range
+            $scope.search.showDataDensityPerHour = false;
+
+            //when using timepicker
+            //var fromTimeOnly = moment($scope.search.fromTime).format("HH:mm:ss");
+            //var toTimeOnly = moment($scope.search.toTime).format("HH:mm:ss");
+            var fromTimeOnly = $scope.search.fromTime;
+            var toTimeOnly = $scope.search.toTime;
+            var formattedFromDate = moment($scope.search.fromDate).format("YYYY-MM-DD");
+            var formattedToDate = moment($scope.search.toDate).format("YYYY-MM-DD");
+            $scope.search.selectedStartDateTime = formattedFromDate + "T" + fromTimeOnly + "Z";
+            $scope.search.selectedEndDateTime = formattedToDate + "T" + toTimeOnly + "Z";
+
+            //build heatmap options
+            url = process.env.API_URL + "/spotviz/spotdata/heatmapCounts/" + $scope.search.callsign
+                + "/hour"
+            //TODO: add date range
+            + "?fromdate=" + $scope.search.selectedStartDateTime;
+            //+ "&todate=" + $scope.search.selectedEndDateTime;
+
+            //retrieve and parse heatmap counts
+            //$http.get(url).success(function (heatmapData) {
+            $http({
+                method: 'GET',
+                url: url
+            }).then(function (response){
+                var heatmapData = response.data;
+
+                if (heatmapData == {}) {
+                    $scope.search.showDataDensityHour = false;
+                }
+                else{
+                    $scope.search.heatmap.perhourConfig = {};
+                    $scope.search.heatmap.perhourConfig = {
+                        domain: "day",
+                        subDomain: "x_hour",
+                        legend : [50,100,300,500],
+                        rowLimit: 24,
+                        range: 1, ////angular-cal-heatmap default: 3
+                        start: $scope.search.heatmap.clickedDate
+                        //start: new Date("2018-06-30T01:00:00.000Z")
+                    }
+                };
+
+                //reformat data to expected format for Cal-HeatMap
+                //TODO: can this processing be moved to the endpoint?
+                var parser = function(data) {
+                    var parsedData = {};
+                    parsedData.display = {};
+                    parsedData.lookup = {};
+                    for (var i in data.heatmapCounts) {
+                        var ts = data.heatmapCounts[i]._id; //test removing this: / 1000;
+                        ts = ts / 1000; // change back to seconds for cal-heatmap expected format
+                        parsedData.display[ts] = data.heatmapCounts[i].count;
+                        parsedData.lookup[ts] = {
+                            firstSpot:  data.heatmapCounts[i].firstSpot,
+                            lastSpot: data.heatmapCounts[i].lastSpot,
+                            count: data.heatmapCounts[i].count
+                        };
+                    }
+                    return parsedData;
+                };
+                var parsedHeatmapData = parser(heatmapData);
+                $scope.search.heatmap.perhourConfig.data = parsedHeatmapData.display;
+                $scope.search.heatmap.perhourConfig.rawdata = parsedHeatmapData.lookup;
+
+                //afterLoadData not supported by directive?
+                //$scope.search.heatmap.config.afterLoadData = parser;
+
+                //toggle flag for ng-if display
+                $scope.search.showDataDensityPerHour = true;
+
+            }, function (error){
+                console.log(error);
+                //TODO: msg is not currently displayed on page?
+                $scope.msg = "Failed to retrieve heatmap data at this time. Try later?";
+            });
+
+        }
+
+
+
         //Start the playback
         $scope.start = function () {
             //if already running, do nothing
