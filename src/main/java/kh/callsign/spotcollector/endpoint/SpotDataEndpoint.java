@@ -41,6 +41,11 @@ import kh.mongo.MongoConnection;
 @Path("/spotdata")
 public class SpotDataEndpoint {
 
+	enum HeatmapUnits{
+		DAY,
+		HOUR
+	}
+	
 	private DateTimeFormatter dateFormatter = DateTimeFormatter.ISO_DATE_TIME;
 
 	/**
@@ -133,11 +138,12 @@ public class SpotDataEndpoint {
 	}
 
 	/**
-	 * Used by getHeatmapCountsForCallsignAndDateRange().
+	 * Used by getHeatmapCountsForCallsignAndDateRange(), builds $group clause for the 
+	 * heatmap counts.
 	 * 
 	 * @return
 	 */
-	DBObject getAggregationQueryGroup() {
+	DBObject getAggregationQueryGroupForHeatmapCounts(HeatmapUnits unit) {
 
 		/*
 		 * {"$group": { "_id": { "$subtract": [ { "$subtract": [
@@ -159,19 +165,27 @@ public class SpotDataEndpoint {
 
 		List<Object> modList1 = new ArrayList<>();
 		modList1.add(subtractTimeStampEpochDate);
-		modList1.add(86400000); // 1000 * 60 * 60 * 24
+		
+		if(unit == HeatmapUnits.DAY) {
+			modList1.add(1000 * 60 * 60 * 24);
+		}
+		else if(unit == HeatmapUnits.HOUR){
+			modList1.add(1000 * 60 * 60);
+		}
+		
 		DBObject mod = new BasicDBObject("$mod", modList1);
 		subtractList1.add(mod);
 
 		DBObject query = BasicDBObjectBuilder.start().push("$group").push("_id")
-				.add("$subtract", subtractList1).pop()
+				.add("$subtract", subtractList1)
+				.pop()
 				.add("count", new BasicDBObject("$sum", 1))
 				.add("firstSpot", new BasicDBObject("$min", "$spotReceivedTimestamp"))
 				.add("lastSpot", new BasicDBObject("$max", "$spotReceivedTimestamp"))
 				.get();
 		return query;
 	}
-
+	
 	/**
 	 * Retrieves spot counts per date for Heatmap display. Groups spot counts
 	 * per day.
@@ -245,8 +259,8 @@ public class SpotDataEndpoint {
 			DBObject matchFields = new BasicDBObject("$match", new BasicDBObject("spotter",
 					callsign));
 
-			// get $group
-			DBObject groupFields = this.getAggregationQueryGroup();
+			// get $group for heatmap per day
+			DBObject groupFields = this.getAggregationQueryGroupForHeatmapCounts(HeatmapUnits.DAY);
 
 			// TODO: need to append date range
 
@@ -291,6 +305,116 @@ public class SpotDataEndpoint {
 		return response;
 	}
 
+	/**
+	 * Retrieves spot counts per date for Heatmap display. Groups spot counts
+	 * per day.
+	 */
+	/**
+	 * @param callsign
+	 * @param fromDate
+	 * @param toDate
+	 * @return
+	 */
+	@GET
+	@Path("/heatmapCounts/{spotter}/hour")
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response getHeatmapCountsForCallsignAndDateRangeForDay(@PathParam("spotter") String callsign,
+		@QueryParam("fromDate") String fromDate,
+		@QueryParam("toDate") String toDate)
+	{
+
+		/*
+		 * Expected data structure in return is: { "946721039":1, "946706853":1,
+		 * "946706340":1, ... }
+		 */
+
+/*
+
+db.Spot.aggregate([ 
+{ $match : { "spotter" : "KK6DCT", "spotReceivedTimestamp" : { $gte : ISODate( "2018-06-28T00:00:00Z"), $lt : ISODate( "2018-06-28T23:59:59Z") } } }, 
+{ $group : { "_id" : 
+	{ 
+	  "year" : { "$year" : "$spotReceivedTimestamp" },
+	  "month" : { "$month" : "$spotReceivedTimestamp"  },
+	  "day" : { "$dayOfMonth" : "$spotReceivedTimestamp" },
+	  "hour" : { "$hour" : "$spotReceivedTimestamp" }
+	},
+	count: { $sum:1} } },
+{ $sort : { _id : 1 } }
+])
+
+ 
+ */
+		Response response = null;
+		String jsonString = null;
+		StringBuilder jsonResult = new StringBuilder();
+		try {
+
+			DBCursor c = null;
+			DB db = MongoConnection.getMongoDB();
+			DBCollection col = db.getCollection("Spot");
+
+			//String startDateString = selectedDate + "T00:00:00+00:00";
+			ZonedDateTime start = this.parseDateStringToUTC(fromDate);
+			
+			//String endDateString = selectedDate + "T23:59:59+00:00";
+			ZonedDateTime end = this.parseDateStringToUTC(toDate);
+			
+			// {$match: {spotter: "callsign"}},
+			DBObject matchFields = new BasicDBObject("$match", 
+					new BasicDBObject("spotter",callsign)
+					.append("spotReceivedTimestamp", 
+							new BasicDBObject("$gte", Date.from(start.toInstant())) //TODO
+								.append("$lte", Date.from(end.toInstant())))
+					);
+			
+			// get $group
+			DBObject groupFields = this.getAggregationQueryGroupForHeatmapCounts(HeatmapUnits.HOUR);
+
+
+			// debug
+			String match = JSON.serialize(matchFields);
+			System.out.println(match);
+			String group = JSON.serialize(groupFields);
+			System.out.println(group);
+
+			List<DBObject> pipeline = new ArrayList<>();
+
+			pipeline.add(matchFields);
+			pipeline.add(groupFields);
+			pipeline.add(new BasicDBObject("$sort", new BasicDBObject("_id", 1)));
+			//updated to add now required cursor aggregation option
+			AggregationOptions aggregationOptions = AggregationOptions.builder()
+					.outputMode(AggregationOptions.OutputMode.CURSOR).build();
+			Iterator<DBObject> cursor =  col.aggregate(pipeline, aggregationOptions);
+			
+			// TODO should data returned include pagination details
+			jsonResult.append("{ \"heatmapCounts\" : [ ");
+			boolean firstResult = true;
+			while(cursor.hasNext()) {
+				DBObject next = cursor.next();
+				if (firstResult) {
+					firstResult = false;
+				} else {
+					jsonResult.append(", ");
+				}
+				jsonString = JSON.serialize(next);
+				jsonResult.append(jsonString);
+			}
+			jsonResult.append(" ] }");
+			if (jsonString == null) {
+				jsonString = "{}";
+			}
+			response = Response.status(Status.OK).entity(jsonResult.toString()).build();
+		} catch (UnknownHostException e) {
+			response = Response.status(Status.INTERNAL_SERVER_ERROR)
+					.entity("Error connecting to MongoDB").build();
+		}
+
+		return response;
+	}
+
+	
 	/**
 	 * Returns spots for given spotter callsign within date range. If no date
 	 * range passed, return a summary for the given callsign.

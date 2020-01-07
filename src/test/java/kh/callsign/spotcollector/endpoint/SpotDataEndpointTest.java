@@ -17,6 +17,8 @@ import org.junit.Test;
 import com.mongodb.DBObject;
 import com.mongodb.util.JSON;
 
+import kh.callsign.spotcollector.endpoint.SpotDataEndpoint.HeatmapUnits;
+
 public class SpotDataEndpointTest {
 
 	private static final String EXPECTED_AGGREGATION_QUERY = "{ \"$group\" : { \"_id\" : { \"$subtract\" : [ { \"$subtract\" : [ \"$spotReceivedTimestamp\" , { \"$date\" : \"1970-01-01T00:00:00.000Z\"}]} , { \"$mod\" : [ { \"$subtract\" : [ \"$spotReceivedTimestamp\" , { \"$date\" : \"1970-01-01T00:00:00.000Z\"}]} , 86400000]}]} , \"count\" : { \"$sum\" : 1}}}";
@@ -37,7 +39,7 @@ public class SpotDataEndpointTest {
 	@Test
 	public void testGetAggregationQueryGroup(){
 		SpotDataEndpoint endpoint = new SpotDataEndpoint();
-		DBObject o = endpoint.getAggregationQueryGroup();
+		DBObject o = endpoint.getAggregationQueryGroupForHeatmapCounts(HeatmapUnits.DAY);
 		
 		String jsonString = JSON.serialize(o);
 		assertEquals(EXPECTED_AGGREGATION_QUERY, jsonString);

@@ -390,9 +390,6 @@ spotVizControllers.controller('SpotVizController', ['$scope', '$http', '$filter'
             //set heatmap display back to false to force to redraw if there is data for range
             $scope.search.showDataDensityPerHour = false;
 
-            //when using timepicker
-            //var fromTimeOnly = moment($scope.search.fromTime).format("HH:mm:ss");
-            //var toTimeOnly = moment($scope.search.toTime).format("HH:mm:ss");
             var fromTimeOnly = $scope.search.fromTime;
             var toTimeOnly = $scope.search.toTime;
             var formattedFromDate = moment($scope.search.fromDate).format("YYYY-MM-DD");
@@ -400,12 +397,36 @@ spotVizControllers.controller('SpotVizController', ['$scope', '$http', '$filter'
             $scope.search.selectedStartDateTime = formattedFromDate + "T" + fromTimeOnly + "Z";
             $scope.search.selectedEndDateTime = formattedToDate + "T" + toTimeOnly + "Z";
 
-            //build heatmap options
+            //TODO: from from to with utc equivalent of local midnight to 23:59:59
+            var now = moment();
+            var timezoneOffsetMinutes = now.utcOffset();
+            console.log("now: " + now.format());
+            console.log("utc offset: " + timezoneOffsetMinutes);
+            console.log("clicked date: " + moment($scope.search.heatmap.clickedDate).format());
+
+            //TODO
+            //endpoint expecting format: 2020-01-01T00:00:00+00:00
+
+            var formattedSelectedFromDate = moment($scope.search.heatmap.clickedDate)
+                .hours(0)
+                .minutes(0)
+                .seconds(0)
+                .format(); //"YYYY-MM-DDTHH:mm:ss"
+            //formattedSelectedFromDate = formattedSelectedFromDate + "+00:00";
+            var formattedSelectedToDate = moment($scope.search.heatmap.clickedDate)
+                .hours(23)
+                .minutes(59)
+                .seconds(59)
+                // .add(23, 'hours')
+                // .add(59, 'minutes')
+                // .utc().format("YYYY-MM-DDTHH:mm:ss");
+                .format();
+            //formattedSelectedToDate = formattedSelectedToDate + "+00:00";
+            //build hourly heatmap url
             url = process.env.API_URL + "/spotviz/spotdata/heatmapCounts/" + $scope.search.callsign
                 + "/hour"
-            //TODO: add date range
-            + "?fromdate=" + $scope.search.selectedStartDateTime;
-            //+ "&todate=" + $scope.search.selectedEndDateTime;
+                + "?fromDate=" + encodeURIComponent(formattedSelectedFromDate)
+                + "&toDate=" + encodeURIComponent(formattedSelectedToDate);
 
             //retrieve and parse heatmap counts
             //$http.get(url).success(function (heatmapData) {

@@ -139,31 +139,14 @@
             <div class="panel-heading">
                 <h3 class="panel-title">Distribution of data for selected date range</h3>
             </div>
-
-
-            <div>
-                $scope.search.showDataDensity: {{ search.showDataDensity }}
-            </div>
-            <div>
-                $scope.search.heatmap.config: {{ search.heatmap.config }}
-            </div>
             <div class="row" ng-show="search.showDataDensity">
     			<div class="col-md-12">
         			<cal-heatmap ng-if="search.showDataDensity" config="search.heatmap.config"
         				ng-click="showStatsForDate($event)"></cal-heatmap>
-                    <button ng-click="showHeatmapPerHour()">Show heatmap per hour for this day</button>
     			</div>
 			</div>
-
-
-            <div>
-                $scope.search.showDataDensityPerHour: {{ search.showDataDensityPerHour }}
-            </div>
-            <div>
-                $scope.search.heatmap.perhourConfig: {{ search.heatmap.perhourConfig }}
-            </div>
+            <div class="row"></div>
             <div class="row" ng-show="search.showDataDensityPerHour">
-                Test: hourly heatmap here:
                 <div class="col-md-12">
                     <cal-heatmap ng-if="search.showDataDensityPerHour" config="search.heatmap.perhourConfig"
                     </cal-heatmap>
