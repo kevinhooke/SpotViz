@@ -12,9 +12,11 @@ import java.util.Iterator;
 import java.util.List;
 
 import javax.enterprise.context.RequestScoped;
+import javax.inject.Inject;
 import javax.json.Json;
 import javax.json.JsonArrayBuilder;
 import javax.json.JsonObjectBuilder;
+import javax.validation.constraints.NotEmpty;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -26,7 +28,6 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
 import com.mongodb.AggregationOptions;
-import com.mongodb.AggregationOutput;
 import com.mongodb.BasicDBObject;
 import com.mongodb.BasicDBObjectBuilder;
 import com.mongodb.DB;
@@ -35,6 +36,7 @@ import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
 import com.mongodb.util.JSON;
 
+import kh.callsign.spotcollector.endpoint.service.SpotDataService;
 import kh.mongo.MongoConnection;
 
 @RequestScoped
@@ -48,6 +50,9 @@ public class SpotDataEndpoint {
 	
 	private DateTimeFormatter dateFormatter = DateTimeFormatter.ISO_DATE_TIME;
 
+	@Inject
+	private SpotDataService spotDataService;
+	
 	/**
 	 * Returns last 10 stored for all spotter callsigns.
 	 * 
@@ -319,8 +324,8 @@ public class SpotDataEndpoint {
 	@Path("/heatmapCounts/{spotter}/hour")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getHeatmapCountsForCallsignAndDateRangeForDay(@PathParam("spotter") String callsign,
-		@QueryParam("fromDate") String fromDate,
-		@QueryParam("toDate") String toDate)
+		@NotEmpty @QueryParam("fromDate") String fromDate,
+		@NotEmpty @QueryParam("toDate") String toDate)
 	{
 
 		/*
@@ -437,7 +442,8 @@ db.Spot.aggregate([
 	@Path("/spots/{callsign}")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getSpotsForCallsignBetweenDateRange(@PathParam("callsign") String callsign,
-			@QueryParam("fromdate") String fromDate, @QueryParam("todate") String toDate,
+			@NotEmpty @QueryParam("fromdate") String fromDate, 
+			@NotEmpty @QueryParam("todate") String toDate,
 			@QueryParam("interval") int interval, @QueryParam("flatpages") Boolean flatPages) {
 		Response response = null;
 
