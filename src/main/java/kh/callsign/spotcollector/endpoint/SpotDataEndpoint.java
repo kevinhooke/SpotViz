@@ -442,8 +442,8 @@ db.Spot.aggregate([
 	@Path("/spots/{callsign}")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getSpotsForCallsignBetweenDateRange(@PathParam("callsign") String callsign,
-			@NotEmpty @QueryParam("fromdate") String fromDate, 
-			@NotEmpty @QueryParam("todate") String toDate,
+			@QueryParam("fromdate") String fromDate, 
+			@QueryParam("todate") String toDate,
 			@QueryParam("interval") int interval, @QueryParam("flatpages") Boolean flatPages) {
 		Response response = null;
 
@@ -505,6 +505,7 @@ db.Spot.aggregate([
 									jsonString, fromDateParsed, toDateParsed);
 						}
 					} else {
+						//TODO: check if this is really a summary?
 						jsonString = this.retrieveSpotSummaryForCallsign(col, callsign);
 					}
 
