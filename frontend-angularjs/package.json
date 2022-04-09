@@ -42,7 +42,7 @@
     "jquery": "^3.4.1",
     "jquery-ui": "^1.12.1",
     "l": "^0.6.0",
-    "moment": "^2.24.0",
+    "moment": "^2.29.2",
     "ng-dialog": "^1.4.0",
     "ngtemplate-loader": "^2.0.1",
     "node-sass": "^4.13.0",
